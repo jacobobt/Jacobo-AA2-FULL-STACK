@@ -1,28 +1,35 @@
-# FULL STACK ATTACK - JobConnect (Producto 1)
+# FULL STACK ATTACK - JobConnect (Producto 2)
 
 ## Descripción
 **JobConnect** es una plataforma colaborativa de ofertas y demandas de empleo desarrollada por el grupo **FULL STACK ATTACK**.
 
-Este proyecto corresponde al **Producto 1**, centrado en el desarrollo del **frontend** con:
+Este proyecto corresponde al **Producto 2**, centrado en la mejora de la aplicación construida en el **Producto 1** mediante el uso de diferentes **APIs de HTML5** y la incorporación de **persistencia en el navegador**.
+
+La aplicación ha sido desarrollada con:
 - **HTML5**
 - **CSS3**
 - **Bootstrap 5**
-- **JavaScript básico (ES Modules)**
+- **JavaScript vanilla**
 
-La aplicación permite simular:
+La aplicación permite:
 - Visualización de ofertas y demandas de empleo
-- Login de usuario (prototipo)
+- Login de usuario
 - Gestión de usuarios
-- Gestión de publicaciones (ofertas/demandas)
+- Gestión de publicaciones
+- Dashboard con resumen de datos
+- Drag and Drop de publicaciones
+- Gráfico de ofertas y demandas con Canvas
+- Persistencia de datos en el navegador
 
 ---
 
-## Objetivos del Producto 1
-- Aplicar HTML5, CSS3 y Bootstrap en una interfaz web responsive
-- Practicar JavaScript básico con eventos, arrays, objetos y DOM
-- Organizar el proyecto con estructura profesional
-- Implementar un prototipo funcional sin backend ni base de datos
-- Documentar el uso de IA, arquetipos, usabilidad y arquitectura frontend
+## Objetivos del Producto 2
+- Mejorar la aplicación desarrollada en el **Producto 1**
+- Incorporar persistencia de datos en el navegador
+- Utilizar APIs de HTML5 en un caso práctico real
+- Modularizar el proyecto en archivos JavaScript especializados
+- Preparar el frontend para futuras integraciones con backend
+- Mantener una estructura profesional, clara y escalable
 
 ---
 
@@ -34,31 +41,41 @@ La aplicación permite simular:
   - número de demandas
   - número de usuarios
 - Visualización de tarjetas de publicaciones
-- Diferenciación visual entre ofertas y demandas
+- Zona de selección mediante **Drag and Drop**
+- Almacenamiento de publicaciones seleccionadas en **IndexedDB**
 
 ### Interfaz 2 - Login (`login.html`)
 - Formulario de acceso con email y contraseña
-- Validación de credenciales contra datos en memoria
-- Mensajes de error/éxito
+- Validación de campos obligatorios
+- Comprobación de credenciales
 - Guardado de sesión en `localStorage`
 - Visualización del correo en la barra de navegación
+- Botón de cerrar sesión
 
 ### Interfaz 3 - Gestión de ofertas y demandas (`ofertas-demandas.html`)
-- Alta de publicaciones (oferta/demanda)
+- Alta de publicaciones de tipo oferta o demanda
 - Listado dinámico en tabla
 - Eliminación de publicaciones
 - Validaciones básicas de formulario
+- Gráfico dinámico realizado con **Canvas**
+- Actualización automática del gráfico al añadir o eliminar publicaciones
 
 ### Interfaz 4 - Gestión de usuarios (`usuarios.html`)
 - Alta de usuarios
 - Listado dinámico en tabla
 - Eliminación de usuarios
-- Validaciones básicas de formulario
+- Validación de campos obligatorios
+- Control de correos duplicados
 
-### Mejoras UX
+### Mejoras UX y técnicas
 - Navbar común en todas las pantallas
 - Botón de cerrar sesión
 - Script común de UI (`ui.js`) para gestión de sesión en la interfaz
+- Uso de `localStorage` para usuarios y sesión activa
+- Uso de **IndexedDB** para publicaciones y selección del dashboard
+- Uso de **Canvas API**
+- Uso de **Drag and Drop API**
+- Separación entre lógica de interfaz y lógica de almacenamiento
 
 ---
 
@@ -66,43 +83,41 @@ La aplicación permite simular:
 - HTML5
 - CSS3
 - Bootstrap 5
-- JavaScript (ES Modules)
+- JavaScript vanilla
+- localStorage
+- IndexedDB
+- Canvas API
+- Drag and Drop API
 - Git (control de versiones)
+- GitHub
 - VS Code
-- Trello (planificación del equipo)
 
 ---
 
 ## Estructura del proyecto
 
-    full-stack-attack-jobboard/
+    .
     ├── index.html
     ├── login.html
     ├── ofertas-demandas.html
     ├── usuarios.html
-    ├── assets/
-    │   ├── css/
+    ├── README.md
+    ├── assets
+    │   ├── css
     │   │   └── styles.css
-    │   ├── js/
-    │   │   ├── datos.js
-    │   │   ├── ui.js
-    │   │   ├── dashboard.js
-    │   │   ├── login.js
-    │   │   ├── ofertas-demandas.js
-    │   │   └── usuarios.js
-    │   └── img/
-    ├── docs/
-    │   ├── prompts-ia.md
-    │   ├── arquetipos-usuarios.md
-    │   ├── definicion-interfaces.md
-    │   ├── bibliografia.md
-    │   ├── arquitectura-web-usabilidad.md
-    │   └── mockup/
-    │       └── checklist-mockup.md
-    ├── evidencias/
-    │   └── mapa-conceptual/
-    ├── .gitignore
-    └── README.md
+    │   └── js
+    │       ├── almacenaje.js
+    │       ├── datos-iniciales.js
+    │       ├── int_1_dashboard.js
+    │       ├── int_2_login.js
+    │       ├── int_3_empleos.js
+    │       ├── int_4_usuarios.js
+    │       └── ui.js
+    └── docs
+        ├── producto2-uml-requisitos.md
+        └── uml
+            ├── diagrama-componentes-producto2.pdf
+            └── diagrama-modulos-funciones-producto2.pdf
 
 ---
 
@@ -124,52 +139,107 @@ La aplicación permite simular:
 
 ---
 
-## Usuarios de prueba (login)
+## Persistencia de datos
 
-Puedes iniciar sesión con cualquiera de estos usuarios:
+En esta versión ya existe persistencia real en el navegador.
 
-- **laura@jobconnect.com** / `1234`
-- **carlos@techempresa.com** / `1234`
-- **ana@jobconnect.com** / `1234`
+### localStorage
+Se utiliza para almacenar:
+- usuarios
+- usuario activo
+- sesión iniciada
+
+### IndexedDB
+Se utiliza para almacenar:
+- publicaciones de empleo
+- selección del dashboard
 
 ---
 
-## Limitación del prototipo (Producto 1)
+## Datos iniciales
 
-En esta versión **no existe persistencia real de datos** (no hay backend ni base de datos).
+La aplicación carga datos iniciales definidos en `datos-iniciales.js`.
 
-Las altas y bajas de usuarios, ofertas y demandas se realizan **en memoria**.  
-Por tanto:
+Esto permite que:
+- el sistema no empiece vacío
+- se puedan hacer pruebas desde el primer momento
+- existan usuarios y publicaciones base
 
-- al recargar la página
-- o al cambiar de pantalla
+---
 
-se recuperan los datos iniciales definidos en `assets/js/datos.js`.
+## Organización de módulos JavaScript
 
-Esta limitación está prevista en el enunciado del **Producto 1** y se resolverá en productos posteriores.
+### `almacenaje.js`
+- Módulo central de persistencia y acceso a datos
+- Gestiona usuarios, sesión activa, IndexedDB, publicaciones y selección del dashboard
+
+### `ui.js`
+- Módulo común de interfaz
+- Gestiona la visualización del usuario activo en la navbar
+- Controla el botón de cerrar sesión
+- Redirige al login al cerrar sesión
+
+### `int_2_login.js`
+- Controla la lógica de la pantalla de login
+
+### `int_4_usuarios.js`
+- Controla la lógica de alta, listado y borrado de usuarios
+
+### `int_3_empleos.js`
+- Controla la lógica de publicaciones
+- Gestiona el gráfico Canvas
+
+### `int_1_dashboard.js`
+- Controla la lógica del dashboard
+- Gestiona la funcionalidad de Drag and Drop
+
+### `datos-iniciales.js`
+- Contiene los datos base para inicializar la aplicación
 
 ---
 
 ## Documentación incluida
 
 En la carpeta `docs/` se incluye:
+- Documento de requisitos y UML del Producto 2
+- Diagrama de componentes en PDF
+- Diagrama UML de módulos y funciones en PDF
 
-- Registro de prompts usados con IA generativa
-- Arquetipos de usuario
-- Definición funcional de interfaces
-- Checklist de mockup
-- Bibliografía y recursos
-- Descripción simple de arquitectura frontend y usabilidad
+---
+
+## Mejoras respecto al Producto 1
+
+Las principales mejoras incorporadas en este producto son:
+- Persistencia real en el navegador
+- Uso de `localStorage`
+- Uso de **IndexedDB**
+- Uso de **Canvas**
+- Uso de **Drag and Drop**
+- Modularización más clara del código
+- Mejora visual y funcional de la gestión de publicaciones
+- Separación entre lógica de interfaz y lógica de almacenamiento
 
 ---
 
 ## Estado del proyecto
 
-✅ **Producto 1 funcional (frontend prototipo)**
+✅ **Producto 2 funcional**
 
-### Pendiente de completar para la entrega final
+### Funcionalidades actualmente operativas
 
-- Repositorio remoto en GitHub
-- Evidencias (capturas)
-- Mapa conceptual en imagen
-- Mockup final adjunto
+- Login funcional
+- Gestión de usuarios funcional
+- Gestión de ofertas y demandas funcional
+- Dashboard funcional
+- Persistencia en navegador
+- Gráfico Canvas funcional
+- Drag and Drop funcional
+- Documentación UML preparada
+
+---
+
+## Autoría
+
+Proyecto realizado por el equipo **FULL STACK ATTACK** para la asignatura de desarrollo full stack.
+
+Este **Producto 2** ha sido desarrollado a partir de la base del **Producto 1**, ampliando la funcionalidad e interacción de la aplicación según los requisitos del enunciado.
