@@ -1,12 +1,11 @@
 import {
-  usuarios,
-  obtenerSiguienteIdUsuario,
-  agregarUsuario,
-  eliminarUsuarioPorId
-} from "./datos.js";
+  obtenerUsuarios,
+  registrarUsuario,
+  eliminarUsuarioPorId,
+  inicializarUsuarios as inicializarUsuariosStorage
+} from "./almacenaje.js";
 import { pintarUsuarioEnNavbar, configurarBotonCerrarSesion } from "./ui.js";
 
-// Elementos del DOM
 const formUsuario = document.getElementById("form-usuario");
 const nombreUsuario = document.getElementById("nombre-usuario");
 const apellidosUsuario = document.getElementById("apellidos-usuario");
@@ -17,8 +16,8 @@ const rolUsuario = document.getElementById("rol-usuario");
 const tablaUsuariosBody = document.getElementById("tabla-usuarios-body");
 const mensajeUsuario = document.getElementById("mensaje-usuario");
 
-// Inicializar página
-function inicializarUsuarios() {
+function prepararPaginaUsuarios() {
+  inicializarUsuariosStorage();
   pintarUsuarioEnNavbar();
   configurarBotonCerrarSesion();
   pintarTablaUsuarios();
@@ -26,6 +25,8 @@ function inicializarUsuarios() {
 }
 
 function pintarTablaUsuarios() {
+  const usuarios = obtenerUsuarios();
+
   if (usuarios.length === 0) {
     tablaUsuariosBody.innerHTML = `
       <tr>
@@ -82,26 +83,24 @@ function gestionarAltaUsuario(evento) {
     return;
   }
 
-  const emailExiste = usuarios.some((usuario) => usuario.email === email);
-
-  if (emailExiste) {
-    mostrarMensaje("Ya existe un usuario con ese correo electrónico.", "danger");
-    return;
-  }
-
-  const nuevoUsuario = {
-    id: obtenerSiguienteIdUsuario(),
+  const resultado = registrarUsuario({
     nombre,
     apellidos,
     email,
     password,
     rol
-  };
+  });
 
-  agregarUsuario(nuevoUsuario);
+  if (!resultado.ok) {
+    mostrarMensaje(resultado.mensaje, "danger");
+    return;
+  }
 
   pintarTablaUsuarios();
-  mostrarMensaje(`Usuario ${nombre} ${apellidos} creado correctamente.`, "success");
+  mostrarMensaje(
+    `Usuario ${resultado.usuario.nombre} ${resultado.usuario.apellidos} creado correctamente.`,
+    "success"
+  );
   formUsuario.reset();
 }
 
@@ -130,4 +129,4 @@ function capitalizarTexto(texto) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-inicializarUsuarios();
+prepararPaginaUsuarios();

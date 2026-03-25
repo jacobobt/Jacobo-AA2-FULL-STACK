@@ -1,12 +1,11 @@
 import {
-  publicaciones,
-  obtenerSiguienteIdPublicacion,
-  agregarPublicacion,
+  inicializarPublicaciones,
+  obtenerPublicaciones,
+  registrarPublicacion,
   eliminarPublicacionPorId
-} from "./datos.js";
+} from "./almacenaje.js";
 import { pintarUsuarioEnNavbar, configurarBotonCerrarSesion } from "./ui.js";
 
-// Elementos del DOM
 const formPublicacion = document.getElementById("form-publicacion");
 const tipoPublicacion = document.getElementById("tipo-publicacion");
 const tituloPublicacion = document.getElementById("titulo-publicacion");
@@ -15,23 +14,87 @@ const autorPublicacion = document.getElementById("autor-publicacion");
 const ubicacionPublicacion = document.getElementById("ubicacion-publicacion");
 const descripcionPublicacion = document.getElementById("descripcion-publicacion");
 const emailPublicacion = document.getElementById("email-publicacion");
+const fechaPublicacion = document.getElementById("fecha-publicacion");
 
 const tablaPublicacionesBody = document.getElementById("tabla-publicaciones-body");
 const mensajePublicacion = document.getElementById("mensaje-publicacion");
 
-// Inicializar página
-function inicializarPublicaciones() {
+const canvasGrafico = document.getElementById("grafico-publicaciones");
+const contextoGrafico = canvasGrafico ? canvasGrafico.getContext("2d") : null;
+
+function dibujarGraficoPublicaciones(publicaciones) {
+  if (!canvasGrafico || !contextoGrafico) return;
+
+  const totalOfertas = publicaciones.filter(
+    (publicacion) => publicacion.tipo === "oferta"
+  ).length;
+
+  const totalDemandas = publicaciones.filter(
+    (publicacion) => publicacion.tipo === "demanda"
+  ).length;
+
+  const ancho = canvasGrafico.width;
+  const alto = canvasGrafico.height;
+
+  contextoGrafico.clearRect(0, 0, ancho, alto);
+
+  contextoGrafico.fillStyle = "#ffffff";
+  contextoGrafico.fillRect(0, 0, ancho, alto);
+
+  contextoGrafico.fillStyle = "#212529";
+  contextoGrafico.font = "18px Arial";
+  contextoGrafico.fillText("Resumen de publicaciones", 20, 30);
+
+  const baseY = 240;
+  const anchoBarra = 120;
+  const separacion = 100;
+  const xOferta = 80;
+  const xDemanda = xOferta + anchoBarra + separacion;
+
+  const valorMaximo = Math.max(totalOfertas, totalDemandas, 1);
+  const alturaMaxima = 140;
+
+  const alturaOferta = (totalOfertas / valorMaximo) * alturaMaxima;
+  const alturaDemanda = (totalDemandas / valorMaximo) * alturaMaxima;
+
+  contextoGrafico.fillStyle = "#0d6efd";
+  contextoGrafico.fillRect(
+    xOferta,
+    baseY - alturaOferta,
+    anchoBarra,
+    alturaOferta
+  );
+
+  contextoGrafico.fillStyle = "#198754";
+  contextoGrafico.fillRect(
+    xDemanda,
+    baseY - alturaDemanda,
+    anchoBarra,
+    alturaDemanda
+  );
+
+  contextoGrafico.fillStyle = "#212529";
+  contextoGrafico.font = "16px Arial";
+  contextoGrafico.fillText(`Ofertas: ${totalOfertas}`, xOferta, 270);
+  contextoGrafico.fillText(`Demandas: ${totalDemandas}`, xDemanda, 270);
+}
+
+async function prepararPaginaPublicaciones() {
+  await inicializarPublicaciones();
   pintarUsuarioEnNavbar();
   configurarBotonCerrarSesion();
-  pintarTablaPublicaciones();
+  await pintarTablaPublicaciones();
   formPublicacion.addEventListener("submit", gestionarAltaPublicacion);
 }
 
-function pintarTablaPublicaciones() {
+async function pintarTablaPublicaciones() {
+  const publicaciones = await obtenerPublicaciones();
+  dibujarGraficoPublicaciones(publicaciones);
+
   if (publicaciones.length === 0) {
     tablaPublicacionesBody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center text-muted">
+        <td colspan="6" class="text-center text-muted">
           No hay publicaciones registradas.
         </td>
       </tr>
@@ -50,13 +113,22 @@ function pintarTablaPublicaciones() {
         : '<span class="badge text-bg-success">Demanda</span>';
 
     fila.innerHTML = `
-      <td>${publicacion.id}</td>
-      <td>${badgeTipo}</td>
-      <td>${publicacion.titulo}</td>
-      <td>${publicacion.categoria}</td>
-      <td>${publicacion.ubicacion}</td>
-      <td>${publicacion.emailContacto}</td>
-      <td>
+      <td class="columna-id">${publicacion.id}</td>
+      <td class="columna-tipo">${badgeTipo}</td>
+      <td class="columna-detalle">
+        <div class="detalle-publicacion">
+          <div class="detalle-titulo">${publicacion.titulo}</div>
+          <div class="detalle-meta">
+            <span><strong>Categoría:</strong> ${publicacion.categoria}</span>
+          </div>
+          <div class="detalle-meta">
+            <span><strong>Ubicación:</strong> ${publicacion.ubicacion}</span>
+          </div>
+        </div>
+      </td>
+      <td class="columna-fecha">${publicacion.fecha}</td>
+      <td class="columna-email">${publicacion.emailContacto}</td>
+      <td class="columna-acciones">
         <button class="btn btn-sm btn-danger" data-id="${publicacion.id}">
           Eliminar
         </button>
@@ -64,15 +136,15 @@ function pintarTablaPublicaciones() {
     `;
 
     const botonEliminar = fila.querySelector("button");
-    botonEliminar.addEventListener("click", () => {
-      eliminarPublicacion(publicacion.id);
+    botonEliminar.addEventListener("click", async () => {
+      await eliminarPublicacion(publicacion.id);
     });
 
     tablaPublicacionesBody.appendChild(fila);
   });
 }
 
-function gestionarAltaPublicacion(evento) {
+async function gestionarAltaPublicacion(evento) {
   evento.preventDefault();
 
   const tipo = tipoPublicacion.value;
@@ -82,48 +154,55 @@ function gestionarAltaPublicacion(evento) {
   const ubicacion = ubicacionPublicacion.value.trim();
   const descripcion = descripcionPublicacion.value.trim();
   const emailContacto = emailPublicacion.value.trim().toLowerCase();
+  const fecha = fechaPublicacion.value;
 
-  if (!tipo || !titulo || !categoria || !autor || !ubicacion || !descripcion || !emailContacto) {
+  if (
+    !tipo ||
+    !titulo ||
+    !categoria ||
+    !autor ||
+    !ubicacion ||
+    !descripcion ||
+    !emailContacto ||
+    !fecha
+  ) {
     mostrarMensaje("Todos los campos son obligatorios.", "danger");
     return;
   }
 
-  if (descripcion.length < 10) {
-    mostrarMensaje("La descripción debe tener al menos 10 caracteres.", "danger");
-    return;
+  try {
+    const resultado = await registrarPublicacion({
+      tipo,
+      titulo,
+      categoria,
+      autor,
+      ubicacion,
+      descripcion,
+      emailContacto,
+      fecha
+    });
+
+    if (!resultado.ok) {
+      mostrarMensaje("No se pudo guardar la publicación.", "danger");
+      return;
+    }
+
+    await pintarTablaPublicaciones();
+    mostrarMensaje("Publicación guardada correctamente.", "success");
+    formPublicacion.reset();
+  } catch (error) {
+    mostrarMensaje("Ha ocurrido un error al guardar la publicación.", "danger");
   }
-
-  const fechaActual = new Date().toISOString().split("T")[0];
-
-  const nuevaPublicacion = {
-    id: obtenerSiguienteIdPublicacion(),
-    tipo,
-    titulo,
-    categoria,
-    autor,
-    ubicacion,
-    descripcion,
-    emailContacto,
-    fecha: fechaActual
-  };
-
-  agregarPublicacion(nuevaPublicacion);
-
-  pintarTablaPublicaciones();
-  mostrarMensaje("Publicación guardada correctamente.", "success");
-  formPublicacion.reset();
 }
 
-function eliminarPublicacion(idPublicacion) {
-  const eliminado = eliminarPublicacionPorId(idPublicacion);
-
-  if (!eliminado) {
-    mostrarMensaje("No se pudo eliminar la publicación.", "danger");
-    return;
+async function eliminarPublicacion(idPublicacion) {
+  try {
+    await eliminarPublicacionPorId(idPublicacion);
+    await pintarTablaPublicaciones();
+    mostrarMensaje("Publicación eliminada correctamente.", "success");
+  } catch (error) {
+    mostrarMensaje("Ha ocurrido un error al eliminar la publicación.", "danger");
   }
-
-  pintarTablaPublicaciones();
-  mostrarMensaje("Publicación eliminada correctamente.", "success");
 }
 
 function mostrarMensaje(texto, tipo) {
@@ -134,4 +213,4 @@ function mostrarMensaje(texto, tipo) {
   `;
 }
 
-inicializarPublicaciones();
+prepararPaginaPublicaciones();

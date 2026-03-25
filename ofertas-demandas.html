@@ -36,14 +36,15 @@
           <li class="nav-item"><a class="nav-link active" href="ofertas-demandas.html">Ofertas/Demandas</a></li>
           <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
         </ul>
+
         <div class="d-flex align-items-center gap-2">
-  <span class="navbar-text" id="usuario-logueado-nav">
-    No has iniciado sesión
-  </span>
-  <button id="btn-cerrar-sesion" class="btn btn-sm btn-outline-light d-none" type="button">
-    Cerrar sesión
-  </button>
-</div>
+          <span class="navbar-text" id="usuario-logueado-nav">
+            No has iniciado sesión
+          </span>
+          <button id="btn-cerrar-sesion" class="btn btn-sm btn-outline-light d-none" type="button">
+            Cerrar sesión
+          </button>
+        </div>
       </div>
     </div>
   </nav>
@@ -52,7 +53,6 @@
     <h1 class="h3 mb-3">Gestión de ofertas y demandas</h1>
 
     <div class="row g-4">
-      <!-- Formulario -->
       <div class="col-12 col-lg-5">
         <section class="seccion-formulario">
           <h2 class="h5 mb-3">Nueva publicación</h2>
@@ -93,6 +93,11 @@
             </div>
 
             <div class="mb-3">
+              <label for="fecha-publicacion" class="form-label">Fecha</label>
+              <input type="date" id="fecha-publicacion" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
               <label for="email-publicacion" class="form-label">Email de contacto</label>
               <input type="email" id="email-publicacion" class="form-control" required />
             </div>
@@ -106,35 +111,44 @@
         </section>
       </div>
 
-      <!-- Listado -->
       <div class="col-12 col-lg-7">
         <section class="seccion-listado">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h5 mb-0">Listado de publicaciones</h2>
-            <small class="text-muted">Alta y baja en memoria</small>
+            <small class="text-muted">Alta, consulta y baja en navegador</small>
           </div>
 
-          <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
+          <div class="table-responsive tabla-publicaciones-wrapper">
+            <table class="table table-striped table-hover align-middle tabla-publicaciones-pro">
               <thead class="table-dark">
                 <tr>
                   <th>ID</th>
                   <th>Tipo</th>
-                  <th>Título</th>
-                  <th>Categoría</th>
-                  <th>Ubicación</th>
-                  <th>Contacto</th>
-                  <th>Acción</th>
+                  <th>Detalle</th>
+                  <th>Fecha</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-publicaciones-body">
                 <tr>
-                  <td colspan="7" class="text-center text-muted">
+                  <td colspan="6" class="text-center text-muted">
                     No hay publicaciones registradas.
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Gráfico de ofertas y demandas</h2>
+              <small class="text-muted">Canvas HTML5</small>
+            </div>
+
+            <div class="p-3 bg-light border rounded">
+              <canvas id="grafico-publicaciones" width="600" height="300"></canvas>
+            </div>
           </div>
         </section>
       </div>
@@ -143,7 +157,7 @@
 
   <footer>
     <div class="container text-center">
-      FULL STACK ATTACK · JobConnect · Producto 1
+      FULL STACK ATTACK · JobConnect · Producto 2
     </div>
   </footer>
 

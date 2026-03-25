@@ -1,9 +1,8 @@
 /* =========================================================
    JobConnect - FULL STACK ATTACK
-   Producto 1 - Estilos personalizados (Bootstrap + mejoras UX/UI)
+   Producto 2 - Estilos personalizados
    ========================================================= */
 
-/* ---------- Variables visuales ---------- */
 :root {
   --jc-primary: #0d6efd;
   --jc-primary-soft: #eaf2ff;
@@ -12,37 +11,53 @@
   --jc-danger: #dc3545;
   --jc-warning: #ffc107;
   --jc-dark: #212529;
-  --jc-muted: #6c757d;
+  --jc-text: #1f2937;
+  --jc-muted: #6b7280;
   --jc-bg: #f8f9fa;
-  --jc-border: #e9ecef;
+  --jc-surface: #ffffff;
+  --jc-border: #e5e7eb;
+  --jc-border-strong: #d1d5db;
   --jc-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --jc-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --jc-radius: 12px;
+  --jc-shadow-md: 0 10px 28px rgba(0, 0, 0, 0.08);
+  --jc-radius: 14px;
 }
 
-/* ---------- Base general ---------- */
 html,
 body {
   background-color: var(--jc-bg);
-  color: var(--jc-dark);
+  color: var(--jc-text);
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Contenedor principal con aire visual */
+/* ---------- Layout general ---------- */
+
 main.container,
 .container.py-4,
 .container.py-5 {
   animation: fadeInPage 0.35s ease-in-out;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--jc-dark);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
 /* ---------- Navbar ---------- */
+
 .navbar {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .navbar-brand {
@@ -50,105 +65,138 @@ main.container,
   letter-spacing: 0.2px;
 }
 
-/* Enlaces con transición suave */
 .navbar .nav-link {
   border-radius: 8px;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar .nav-link:hover {
-  background-color: rgba(13, 110, 253, 0.08);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .navbar .nav-link.active {
-  background-color: rgba(13, 110, 253, 0.12);
+  background-color: rgba(255, 255, 255, 0.12);
   font-weight: 600;
 }
 
-/* Texto de sesión */
-#usuarioSesionNavbar,
-.usuario-sesion-navbar {
+#usuario-logueado-nav {
   font-weight: 500;
-  color: var(--jc-muted);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-/* ---------- Títulos y bloques ---------- */
-h1,
-h2,
-h3 {
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
+/* ---------- Secciones / cajas ---------- */
 
-.page-title {
-  margin-bottom: 1rem;
-}
-
-/* Tarjetas de sección */
-.section-card {
+.seccion-formulario,
+.seccion-listado {
+  background: var(--jc-surface);
   border: 1px solid var(--jc-border);
   border-radius: var(--jc-radius);
-  background: #fff;
   box-shadow: var(--jc-shadow-sm);
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
-/* ---------- Cards (dashboard y publicaciones) ---------- */
+/* ---------- Formularios ---------- */
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: #374151;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+  border-radius: 10px;
+  border-color: #d9dee5;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: rgba(13, 110, 253, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ---------- Botones ---------- */
+
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn-danger {
+  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.14);
+}
+
+/* ---------- Tarjetas / Dashboard ---------- */
+
 .card {
   border: 1px solid var(--jc-border);
   border-radius: var(--jc-radius);
   box-shadow: var(--jc-shadow-sm);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
   box-shadow: var(--jc-shadow-md);
-  border-color: #dfe6ee;
+  border-color: #d9e1ea;
 }
 
-/* Cabecera de tarjetas */
 .card-title {
   font-weight: 700;
 }
 
-/* Cards resumen (dashboard) */
-.stats-card,
-.card-resumen {
-  position: relative;
-  overflow: hidden;
+.card-publicacion {
+  height: 100%;
 }
 
-.stats-card::after,
-.card-resumen::after {
-  content: "";
-  position: absolute;
-  right: -10px;
-  top: -10px;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: rgba(13, 110, 253, 0.08);
+.card-publicacion[draggable="true"] {
+  cursor: grab;
 }
 
-.stats-card .display-6,
-.card-resumen .display-6 {
-  font-weight: 700;
+.card-publicacion[draggable="true"]:active {
+  cursor: grabbing;
 }
 
-/* ---------- Badges (oferta / demanda / roles) ---------- */
-/* Si ya usas badges Bootstrap, esto solo mejora su estética */
+#contenedor-seleccion {
+  min-height: 120px;
+  border: 2px dashed #d7dde5;
+  border-radius: var(--jc-radius);
+  padding: 0.75rem;
+  background: #fcfdff;
+}
+
+#contenedor-seleccion.drag-over {
+  background: #eef5ff;
+  border-color: var(--jc-primary);
+}
+
+/* ---------- Badges ---------- */
+
 .badge {
   font-weight: 600;
   border-radius: 999px;
-  padding: 0.45em 0.75em;
+  padding: 0.42em 0.72em;
   letter-spacing: 0.2px;
 }
 
-/* Clases recomendadas para tipo de publicación */
 .badge-oferta {
   background-color: var(--jc-primary-soft);
   color: var(--jc-primary);
@@ -161,115 +209,171 @@ h3 {
   border: 1px solid rgba(25, 135, 84, 0.15);
 }
 
-/* Roles (si los usas en tabla de usuarios) */
-.badge-rol-candidato {
-  background-color: #f3e8ff;
-  color: #7e22ce;
-  border: 1px solid rgba(126, 34, 206, 0.15);
-}
+/* ---------- Tabla general ---------- */
 
-.badge-rol-empresa {
-  background-color: #fff4e5;
-  color: #b45309;
-  border: 1px solid rgba(180, 83, 9, 0.15);
-}
-
-/* ---------- Botones ---------- */
-.btn {
-  border-radius: 10px;
-  font-weight: 600;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.10);
-}
-
-.btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.btn:focus {
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
-}
-
-/* Botón peligro (eliminar) un poco más claro visualmente */
-.btn-danger {
-  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.14);
-}
-
-/* ---------- Formularios ---------- */
-.form-control,
-.form-select,
-textarea.form-control {
-  border-radius: 10px;
-  border-color: #dce3ea;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-}
-
-.form-control:focus,
-.form-select:focus,
-textarea.form-control:focus {
-  border-color: rgba(13, 110, 253, 0.45);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
-}
-
-.form-label {
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-}
-
-/* Grupo de formulario */
-.form-section {
-  background: #fff;
-  border: 1px solid var(--jc-border);
-  border-radius: var(--jc-radius);
-  box-shadow: var(--jc-shadow-sm);
-  padding: 1rem;
-}
-
-/* ---------- Tablas ---------- */
 .table {
   margin-bottom: 0;
   vertical-align: middle;
 }
 
 .table thead th {
-  background-color: #f1f5f9;
-  border-bottom: 1px solid #dfe6ee;
+  background-color: #eef2f6;
+  border-bottom: 1px solid #dde5ee;
+  color: #334155;
+  font-weight: 700;
+}
+
+/* ---------- Tabla profesional de publicaciones ---------- */
+
+.tabla-publicaciones-wrapper {
+  overflow-x: visible;
+}
+
+.tabla-publicaciones-pro {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.tabla-publicaciones-pro thead th {
+  background-color: #eef2f6;
   color: #334155;
   font-weight: 700;
   white-space: nowrap;
+  text-align: center;
+  padding: 1rem 0.65rem;
+  border-bottom: 1px solid #dde5ee;
 }
 
-.table tbody tr {
-  transition: background-color 0.18s ease;
+.tabla-publicaciones-pro tbody td {
+  background-color: #f1f3f5;
+  padding: 1rem 0.7rem;
+  vertical-align: middle;
+  line-height: 1.35;
 }
 
-.table tbody tr:hover {
-  background-color: #f8fbff;
+.tabla-publicaciones-pro tbody tr:hover td {
+  background-color: #eef4ff;
 }
 
-/* Contenedor de tabla con estilo */
-.table-container {
-  background: #fff;
-  border: 1px solid var(--jc-border);
-  border-radius: var(--jc-radius);
-  box-shadow: var(--jc-shadow-sm);
-  overflow: hidden;
+.tabla-publicaciones-pro tbody td:first-child {
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
 }
 
-/* ---------- Alerts (feedback visual) ---------- */
+.tabla-publicaciones-pro tbody td:last-child {
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Reparto de columnas */
+.tabla-publicaciones-pro th:nth-child(1),
+.tabla-publicaciones-pro td:nth-child(1) {
+  width: 5%;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro th:nth-child(2),
+.tabla-publicaciones-pro td:nth-child(2) {
+  width: 11%;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro th:nth-child(3),
+.tabla-publicaciones-pro td:nth-child(3) {
+  width: 34%;
+  text-align: left;
+}
+
+.tabla-publicaciones-pro th:nth-child(4),
+.tabla-publicaciones-pro td:nth-child(4) {
+  width: 13%;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro th:nth-child(5),
+.tabla-publicaciones-pro td:nth-child(5) {
+  width: 25%;
+}
+
+.tabla-publicaciones-pro th:nth-child(6),
+.tabla-publicaciones-pro td:nth-child(6) {
+  width: 12%;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro .columna-id {
+  white-space: nowrap;
+  font-weight: 600;
+  color: #111827;
+}
+
+.tabla-publicaciones-pro .columna-tipo {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro .columna-fecha {
+  white-space: nowrap;
+  text-align: center;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.tabla-publicaciones-pro .columna-email {
+  white-space: nowrap;
+  text-align: left;
+  font-size: 0.93rem;
+  color: #111827;
+  padding-left: 0.9rem;
+}
+
+.tabla-publicaciones-pro .columna-acciones {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tabla-publicaciones-pro .columna-acciones button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 0.32rem 0.5rem;
+  font-size: 0.74rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  white-space: nowrap;
+  margin: 0 auto;
+}
+
+.detalle-publicacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.detalle-titulo {
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.28;
+  margin-bottom: 0.08rem;
+}
+
+.detalle-meta {
+  color: #4b5563;
+  font-size: 0.91rem;
+  line-height: 1.24;
+}
+
+.detalle-meta strong {
+  color: #374151;
+}
+
+/* ---------- Alerts ---------- */
+
 .alert {
   border-radius: 10px;
   border: 1px solid transparent;
@@ -277,70 +381,30 @@ textarea.form-control:focus {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.alert-success {
-  border-color: rgba(25, 135, 84, 0.18);
+/* ---------- Canvas ---------- */
+
+canvas#grafico-publicaciones {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
-.alert-danger {
-  border-color: rgba(220, 53, 69, 0.18);
-}
+/* ---------- Footer ---------- */
 
-.alert-warning {
-  border-color: rgba(255, 193, 7, 0.25);
-}
-
-/* ---------- Estado vacío / mensajes informativos ---------- */
-.empty-state,
-.estado-vacio {
-  border: 1px dashed #cfd8e3;
-  background: #ffffff;
-  border-radius: var(--jc-radius);
-  padding: 1rem;
-  color: #64748b;
-}
-
-/* ---------- Dashboard: tarjetas de publicaciones ---------- */
-.publicacion-card .card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.publicacion-card .meta-linea {
-  color: var(--jc-muted);
-  font-size: 0.95rem;
-}
-
-.publicacion-card .descripcion-corta {
-  color: #495057;
-  line-height: 1.45;
-}
-
-/* ---------- Footer (si lo añades más adelante) ---------- */
 footer {
   color: var(--jc-muted);
   font-size: 0.95rem;
+  padding: 1rem 0;
 }
 
-/* ---------- Utilidades visuales extra ---------- */
-.shadow-soft {
-  box-shadow: var(--jc-shadow-sm);
-}
+/* ---------- Animaciones ---------- */
 
-.rounded-soft {
-  border-radius: var(--jc-radius);
-}
-
-.border-soft {
-  border: 1px solid var(--jc-border);
-}
-
-/* ---------- Animaciones suaves (para rúbrica) ---------- */
 @keyframes fadeInPage {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -352,6 +416,7 @@ footer {
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -359,26 +424,63 @@ footer {
 }
 
 /* ---------- Responsive ---------- */
+
+@media (max-width: 1200px) {
+  .tabla-publicaciones-pro {
+    font-size: 0.91rem;
+  }
+
+  .tabla-publicaciones-pro thead th,
+  .tabla-publicaciones-pro tbody td {
+    padding: 0.9rem 0.55rem;
+  }
+
+  .tabla-publicaciones-pro th:nth-child(3),
+  .tabla-publicaciones-pro td:nth-child(3) {
+    width: 32%;
+  }
+
+  .tabla-publicaciones-pro th:nth-child(5),
+  .tabla-publicaciones-pro td:nth-child(5) {
+    width: 26%;
+  }
+
+  .tabla-publicaciones-pro .columna-acciones button {
+    min-width: 60px;
+    padding: 0.28rem 0.45rem;
+    font-size: 0.71rem;
+  }
+}
+
 @media (max-width: 992px) {
-  .navbar .d-flex.gap-2,
   .navbar .d-flex.align-items-center.gap-2 {
     margin-top: 0.5rem;
   }
 
   .card:hover {
-    transform: none; /* en pantallas táctiles evita efecto extraño */
+    transform: none;
     box-shadow: var(--jc-shadow-sm);
+  }
+
+  .tabla-publicaciones-wrapper {
+    overflow-x: auto;
+  }
+
+  .tabla-publicaciones-pro {
+    min-width: 860px;
+    table-layout: auto;
+    border-spacing: 0 10px;
   }
 }
 
 @media (max-width: 768px) {
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
   }
 
-  .table thead th,
-  .table tbody td {
-    font-size: 0.92rem;
+  .seccion-formulario,
+  .seccion-listado {
+    padding: 1rem;
   }
 
   .btn {

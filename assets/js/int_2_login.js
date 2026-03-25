@@ -1,24 +1,22 @@
-import { usuarios } from "./datos.js";
+import { loguearUsuario, inicializarUsuarios } from "./almacenaje.js";
 import { pintarUsuarioEnNavbar, configurarBotonCerrarSesion } from "./ui.js";
 
-// Elementos del DOM
 const formLogin = document.getElementById("form-login");
 const emailLogin = document.getElementById("email-login");
 const passwordLogin = document.getElementById("password-login");
 const mensajeLogin = document.getElementById("mensaje-login");
 
-// Inicializar pantalla login
 function inicializarLogin() {
+  inicializarUsuarios();
   pintarUsuarioEnNavbar();
   configurarBotonCerrarSesion();
   formLogin.addEventListener("submit", gestionarLogin);
 }
 
-// Gestionar envío del formulario
 function gestionarLogin(evento) {
   evento.preventDefault();
 
-  const email = emailLogin.value.trim().toLowerCase();
+  const email = emailLogin.value.trim();
   const password = passwordLogin.value.trim();
 
   if (!email || !password) {
@@ -26,27 +24,18 @@ function gestionarLogin(evento) {
     return;
   }
 
-  const usuarioEncontrado = usuarios.find(
-    (usuario) => usuario.email === email && usuario.password === password
-  );
+  const usuarioActivo = loguearUsuario(email, password);
 
-  if (!usuarioEncontrado) {
-    mostrarMensaje("Credenciales incorrectas. Revisa el correo y la contraseña.", "danger");
+  if (!usuarioActivo) {
+    mostrarMensaje(
+      "Credenciales incorrectas. Revisa el correo y la contraseña.",
+      "danger"
+    );
     return;
   }
 
-  const usuarioParaGuardar = {
-    id: usuarioEncontrado.id,
-    nombre: usuarioEncontrado.nombre,
-    apellidos: usuarioEncontrado.apellidos,
-    email: usuarioEncontrado.email,
-    rol: usuarioEncontrado.rol
-  };
-
-  localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioParaGuardar));
-
   pintarUsuarioEnNavbar();
-  mostrarMensaje(`Login correcto. Bienvenido/a, ${usuarioEncontrado.nombre}.`, "success");
+  mostrarMensaje(`Login correcto. Bienvenido/a, ${usuarioActivo.nombre}.`, "success");
   formLogin.reset();
 }
 

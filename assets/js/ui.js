@@ -1,16 +1,4 @@
-// ====== Utilidades de interfaz (UI) comunes ======
-
-export function obtenerUsuarioLogueado() {
-  const usuarioGuardado = localStorage.getItem("usuarioLogueado");
-
-  if (!usuarioGuardado) return null;
-
-  try {
-    return JSON.parse(usuarioGuardado);
-  } catch (error) {
-    return null;
-  }
-}
+import { obtenerUsuarioActivo, cerrarSesion } from "./almacenaje.js";
 
 export function pintarUsuarioEnNavbar() {
   const elementoUsuarioNav = document.getElementById("usuario-logueado-nav");
@@ -18,7 +6,7 @@ export function pintarUsuarioEnNavbar() {
 
   if (!elementoUsuarioNav) return;
 
-  const usuario = obtenerUsuarioLogueado();
+  const usuario = obtenerUsuarioActivo();
 
   if (!usuario) {
     elementoUsuarioNav.textContent = "No has iniciado sesión";
@@ -43,7 +31,7 @@ export function configurarBotonCerrarSesion() {
   if (!botonLogout) return;
 
   botonLogout.addEventListener("click", () => {
-    localStorage.removeItem("usuarioLogueado");
+    cerrarSesion();
     window.location.href = "login.html";
   });
 }
