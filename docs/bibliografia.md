@@ -1,110 +1,98 @@
-# Bibliografía y recursos - Producto 1 (JobConnect)
+# Bibliografía - Producto 2
 
 ## 1. Introducción
-Este documento recoge la bibliografía y los recursos consultados para el desarrollo del **Producto 1** del proyecto **JobConnect**.
 
-Se han utilizado recursos orientados a:
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript
-- Usabilidad y UX
-- Arquitectura web frontend
-- Control de versiones con Git/GitHub
+Para el desarrollo del Producto 2 de JobConnect se han utilizado distintas fuentes de apoyo relacionadas con HTML5, JavaScript, Bootstrap y las APIs necesarias para incorporar persistencia e interacción avanzada en el navegador.
 
----
+La bibliografía incluye documentación técnica, recursos de referencia y herramientas utilizadas para comprender e implementar correctamente las funcionalidades del proyecto.
 
-## 2. Recursos técnicos utilizados
+## 2. Documentación técnica principal
 
-## 2.1 HTML, CSS y JavaScript
-### MDN Web Docs
-- **Descripción**: Documentación de referencia para HTML, CSS y JavaScript
-- **Uso en el proyecto**: Consulta de sintaxis, eventos DOM, formularios, arrays, objetos y manipulación del DOM
-- **Referencia**: MDN Web Docs (Mozilla Developer Network)
+### Mozilla Developer Network (MDN)
 
-### W3Schools (apoyo complementario)
-- **Descripción**: Recurso práctico con ejemplos simples y rápidos
-- **Uso en el proyecto**: Revisión de ejemplos de formularios, tablas y JavaScript básico
-- **Referencia**: W3Schools
+MDN ha sido una de las principales fuentes de consulta para el desarrollo del proyecto, especialmente en todo lo relacionado con formularios HTML, validación, almacenamiento local, bases de datos en navegador, gráficos mediante Canvas, funcionalidad Drag and Drop y modularidad en JavaScript.
 
----
+Se han consultado especialmente los apartados siguientes:
 
-## 2.2 Bootstrap 5
-### Bootstrap Official Documentation
-- **Descripción**: Documentación oficial del framework Bootstrap
-- **Uso en el proyecto**: Uso de navbar, grid system, formularios, tablas, botones, badges y alerts
-- **Referencia**: Bootstrap 5 Documentation
+- HTML forms and validation
+- Web Storage API
+- IndexedDB API
+- Canvas API
+- HTML Drag and Drop API
+- JavaScript modules
 
----
+### Bootstrap
 
-## 2.3 JavaScript y eventos
-### JavaScript.info (recurso complementario)
-- **Descripción**: Explicaciones prácticas sobre JavaScript y DOM
-- **Uso en el proyecto**: Comprensión de eventos (`submit`, `click`) y renderizado dinámico
-- **Referencia**: JavaScript.info
+También se ha utilizado la documentación oficial de Bootstrap como referencia para la maquetación visual de la aplicación y para el uso correcto de componentes como formularios, tablas, alertas, botones y barras de navegación.
 
-### Cisco Networking Academy - JavaScript Essentials
-- **Descripción**: Curso formativo de JavaScript realizado como parte del producto
-- **Uso en el proyecto**: Base conceptual para lógica JS, variables, funciones, arrays, objetos y flujo de control
-- **Referencia**: Cisco NetAcad - JavaScript Essentials
+### JavaScript
 
----
+Además, se han consultado recursos relacionados con JavaScript para trabajar la programación modular, la manipulación del DOM, la gestión de eventos y la integración de las APIs HTML5 requeridas en este producto.
 
-## 2.4 Git y GitHub
-### Git Official Documentation
-- **Descripción**: Documentación oficial de Git
-- **Uso en el proyecto**: Comandos básicos de repositorio local (`init`, `add`, `commit`, `push`)
-- **Referencia**: Git Documentation
+## 3. Recursos utilizados
 
-### GitHub Docs
-- **Descripción**: Documentación oficial de GitHub
-- **Uso en el proyecto**: Creación de repositorio remoto, conexión con repositorio local y publicación del proyecto
-- **Referencia**: GitHub Docs
+### HTML y formularios
 
----
+- MDN Web Docs. HTML forms and input elements.
+- MDN Web Docs. Constraint validation.
+- W3C HTML specifications.
 
-## 3. Recursos de usabilidad y UX
+### Web Storage
 
-### Nielsen Norman Group (NN/g)
-- **Descripción**: Referencia internacional sobre usabilidad y experiencia de usuario
-- **Uso en el proyecto**: Consulta de principios básicos de usabilidad (consistencia, feedback, claridad)
-- **Referencia**: Nielsen Norman Group
+- MDN Web Docs. Web Storage API.
+- Documentación sobre `localStorage` y almacenamiento persistente en navegador.
 
-### Material Design (Google) - principios de diseño (consulta general)
-- **Descripción**: Guía de principios visuales y de interacción
-- **Uso en el proyecto**: Inspiración para jerarquía visual y organización de componentes
-- **Referencia**: Material Design Guidelines
+### IndexedDB
 
----
+- MDN Web Docs. IndexedDB API.
+- Ejemplos y guías de uso de bases de datos locales en navegador.
 
-## 4. Recursos sobre arquitectura web frontend
+### Canvas
 
-### Mozilla Developer Network (MDN) - Client-side web development
-- **Descripción**: Guías introductorias y prácticas sobre desarrollo web del lado cliente
-- **Uso en el proyecto**: Comprensión de estructura frontend, separación HTML/CSS/JS y modularidad
-- **Referencia**: MDN - Client-side web development
+- MDN Web Docs. Canvas API.
+- Documentación sobre dibujo de gráficos básicos en HTML5.
 
-### Documentación oficial de JavaScript (ECMAScript modules)
-- **Descripción**: Información sobre módulos JS (`import` / `export`)
-- **Uso en el proyecto**: Organización modular de scripts (`datos.js`, `ui.js`, etc.)
-- **Referencia**: MDN - JavaScript Modules
+### Drag and Drop
 
----
+- MDN Web Docs. HTML Drag and Drop API.
+- Guías de implementación de arrastrar y soltar en interfaces web.
 
-## 5. Uso de IA generativa como recurso de apoyo
-### ChatGPT
-- **Descripción**: Herramienta de apoyo para guía técnica, estructuración del proyecto, generación de ejemplos y documentación
-- **Uso en el proyecto**:
-  - diseño de estructura de carpetas y archivos
-  - ayuda con HTML/CSS/Bootstrap
-  - implementación paso a paso de JavaScript
-  - redacción técnica de documentación
-- **Observación**: Las respuestas se revisaron y adaptaron manualmente
-- **Referencia**: ChatGPT (OpenAI)
+### Bootstrap
 
----
+- Bootstrap official documentation.
+- Componentes de formularios, tablas, alertas, navbar y botones.
+
+### UML
+
+- PlantUML documentation.
+- PlantText online editor for PlantUML diagrams.
+
+## 4. Enlaces de referencia
+
+- https://developer.mozilla.org/
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
+- https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+- https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
+- https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+- https://getbootstrap.com/docs/5.3/
+- https://plantuml.com/
+- https://www.planttext.com/
+
+## 5. Herramientas utilizadas en el proyecto
+
+Durante el desarrollo también se han utilizado herramientas de apoyo para la implementación, organización y prueba del producto.
+
+Las principales herramientas utilizadas han sido las siguientes:
+
+- Visual Studio Code
+- Live Server
+- Git
+- GitHub
+- PlantText
+- PlantUML
+- Navegador web con herramientas de desarrollo
 
 ## 6. Conclusión
-La combinación de documentación oficial (MDN, Bootstrap, Git, GitHub), recursos de apoyo (W3Schools, JavaScript.info) y materiales de usabilidad/UX ha permitido desarrollar el Producto 1 con una base técnica correcta.
 
-Además, la IA generativa se ha utilizado como apoyo formativo y técnico, manteniendo siempre revisión manual y adaptación al enunciado del proyecto.
+La bibliografía empleada en el Producto 2 ha servido como apoyo tanto para comprender las tecnologías base del proyecto como para implementar correctamente las nuevas funcionalidades introducidas, especialmente `localStorage`, `IndexedDB`, `Canvas`, `Drag and Drop` y la documentación UML del sistema.

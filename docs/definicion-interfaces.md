@@ -1,250 +1,217 @@
-# Definición de interfaces - Producto 1 (JobConnect)
+# Definición de interfaces - Producto 2
 
 ## 1. Introducción
-Este documento define las interfaces desarrolladas en el **Producto 1** del proyecto **JobConnect**, una plataforma colaborativa de ofertas y demandas de empleo.
 
-El objetivo de estas interfaces es representar un prototipo funcional de frontend que permita:
-- visualizar información
-- interactuar con formularios
-- gestionar datos en memoria
-- simular un flujo básico de uso de la aplicación
+En el Producto 2 del proyecto JobConnect se ha realizado una evolución de la interfaz desarrollada en el Producto 1. La aplicación mantiene las cuatro páginas principales, pero ahora incorpora persistencia de datos en el navegador y una interacción más avanzada mediante APIs de HTML5.
+
+Las interfaces han sido diseñadas para ofrecer una navegación clara, coherente y sencilla, manteniendo una estructura visual homogénea en toda la aplicación. Además, se ha mejorado la experiencia de usuario añadiendo almacenamiento persistente, gráfico con Canvas y selección de publicaciones mediante Drag and Drop.
 
 ---
 
-## 2. Resumen de interfaces incluidas
-En el Producto 1 se desarrollan las siguientes interfaces:
+## 2. Objetivo de las interfaces
 
-1. **Dashboard principal**
-2. **Login de usuario**
-3. **Gestión de ofertas y demandas**
-4. **Gestión de usuarios**
+El objetivo principal de las interfaces de JobConnect es permitir al usuario gestionar de forma simple e intuitiva la información principal de la aplicación:
 
-Todas las interfaces se han implementado con:
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript modular
+- iniciar sesión
+- consultar el dashboard general
+- gestionar usuarios
+- gestionar ofertas y demandas de empleo
+- visualizar información resumida y gráfica
+- seleccionar y deseleccionar publicaciones en el dashboard
 
----
-
-## 3. Interfaz 1 - Dashboard principal (`index.html`)
-
-## 3.1 Objetivo
-Mostrar una visión general del sistema mediante un dashboard con:
-- número de ofertas
-- número de demandas
-- número de usuarios
-- listado resumido de publicaciones en formato tarjeta
+Todas las páginas comparten una misma línea visual basada en Bootstrap y una barra de navegación superior con acceso directo a las diferentes secciones.
 
 ---
 
-## 3.2 Elementos de la interfaz
-- **Navbar superior**
-  - nombre del proyecto
-  - enlaces de navegación
-  - usuario logueado (si existe sesión)
-  - botón “Cerrar sesión”
-- **Tarjetas resumen**
-  - total de ofertas
-  - total de demandas
-  - total de usuarios
-- **Listado de publicaciones**
-  - tarjetas con información resumida
-  - diferenciación visual por tipo (oferta/demanda)
+## 3. Interfaces principales de la aplicación
+
+### 3.1 Dashboard principal (`index.html`)
+
+El dashboard es la página principal de la aplicación y actúa como panel general de consulta.
+
+#### Elementos principales
+- barra de navegación superior
+- indicador del usuario logueado
+- botón de cerrar sesión
+- tarjetas resumen con el número de ofertas, demandas y usuarios
+- contenedor de publicaciones recientes
+- zona de selección de publicaciones
+
+#### Funcionalidad
+- muestra un resumen general de la aplicación
+- carga las publicaciones almacenadas en IndexedDB
+- genera tarjetas dinámicas con la información de cada publicación
+- permite seleccionar publicaciones arrastrándolas a la zona inferior
+- permite deseleccionar publicaciones arrastrándolas de nuevo al área principal
+- mantiene guardada la selección del dashboard en IndexedDB
+
+#### Mejoras respecto al Producto 1
+- persistencia real de la selección
+- interacción mediante Drag and Drop
+- actualización automática del resumen
+- mejor separación visual entre zona principal y zona de selección
 
 ---
 
-## 3.3 Comportamiento dinámico (JavaScript)
-- Carga de datos desde `datos.js`
-- Cálculo y renderizado de totales
-- Renderizado dinámico de tarjetas de publicaciones
-- Lectura de sesión desde `localStorage`
-- Actualización de la navbar con el correo del usuario
+### 3.2 Pantalla de login (`login.html`)
+
+La interfaz de login permite autenticar al usuario en la aplicación.
+
+#### Elementos principales
+- barra de navegación
+- formulario de correo electrónico
+- formulario de contraseña
+- botón de iniciar sesión
+- zona de mensajes informativos
+
+#### Funcionalidad
+- valida que los campos estén completos
+- autentica al usuario contra los datos almacenados
+- guarda la sesión activa en localStorage
+- muestra mensajes de error si las credenciales no son correctas
+- muestra mensajes de éxito si el acceso se realiza correctamente
+- actualiza la barra de navegación con el usuario activo
+
+#### Mejoras respecto al Producto 1
+- la sesión persiste al recargar la página
+- el usuario activo se mantiene visible en la barra superior
+- existe control de cierre de sesión desde la interfaz
 
 ---
 
-## 3.4 Validaciones o controles
-- Si no hay publicaciones, se muestra un mensaje informativo en lugar de tarjetas
+### 3.3 Gestión de usuarios (`usuarios.html`)
 
----
+La interfaz de usuarios está orientada al alta, consulta y borrado de usuarios del sistema.
 
-## 4. Interfaz 2 - Login (`login.html`)
+#### Elementos principales
+- barra de navegación
+- formulario de alta de usuario
+- tabla de usuarios registrados
+- mensajes de validación y estado
 
-## 4.1 Objetivo
-Permitir el acceso al prototipo mediante un formulario de login con:
+#### Campos del formulario
+- nombre
+- apellidos
 - correo electrónico
 - contraseña
+- rol
 
-El login es una simulación en frontend, validando contra datos en memoria.
+#### Funcionalidad
+- permite crear nuevos usuarios
+- valida que todos los campos obligatorios estén informados
+- evita correos electrónicos duplicados
+- muestra todos los usuarios guardados
+- permite eliminar usuarios desde la tabla
+- mantiene los datos en localStorage incluso tras recargar la página
 
----
-
-## 4.2 Elementos de la interfaz
-- **Navbar superior**
-  - navegación común
-  - estado de sesión
-  - botón “Cerrar sesión”
-- **Formulario de login**
-  - campo email
-  - campo contraseña
-  - botón de acceso
-- **Zona de mensajes**
-  - feedback visual (éxito / error)
-
----
-
-## 4.3 Comportamiento dinámico (JavaScript)
-- Captura del evento `submit`
-- Validación de campos obligatorios
-- Comprobación de credenciales contra el array `usuarios`
-- Mensajes con Bootstrap (`alert`)
-- Guardado del usuario autenticado en `localStorage`
-- Actualización del correo en la navbar
+#### Mejoras respecto al Producto 1
+- persistencia real de usuarios
+- gestión centralizada desde `almacenaje.js`
+- mayor robustez en validación de datos
+- actualización dinámica de la tabla
 
 ---
 
-## 4.4 Validaciones o controles
-- No permite campos vacíos
-- Muestra error si el usuario o contraseña no coinciden
-- Muestra éxito si el login es correcto
+### 3.4 Gestión de ofertas y demandas (`ofertas-demandas.html`)
+
+Esta interfaz está destinada al alta, consulta y borrado de publicaciones laborales.
+
+#### Elementos principales
+- barra de navegación
+- formulario de nueva publicación
+- tabla de publicaciones
+- gráfico de barras con Canvas
+- mensajes de validación y confirmación
+
+#### Campos del formulario
+- tipo de publicación
+- título
+- categoría profesional
+- empresa o persona
+- ubicación
+- descripción
+- fecha
+- email de contacto
+
+#### Funcionalidad
+- permite registrar ofertas y demandas
+- guarda las publicaciones en IndexedDB
+- muestra las publicaciones en una tabla estructurada
+- permite eliminar publicaciones
+- actualiza automáticamente el gráfico con Canvas
+- conserva la información al recargar la página
+
+#### Mejoras respecto al Producto 1
+- uso de IndexedDB
+- incorporación del campo fecha
+- gráfico visual con Canvas
+- tabla mejor maquetada y más legible
+- persistencia real de publicaciones
 
 ---
 
-## 5. Interfaz 3 - Gestión de ofertas y demandas (`ofertas-demandas.html`)
+## 4. Elementos comunes de interfaz
 
-## 5.1 Objetivo
-Permitir la gestión de publicaciones de empleo (ofertas y demandas), incluyendo:
-- alta de publicación
-- visualización en tabla
-- eliminación de publicaciones
+Las cuatro páginas comparten un conjunto de elementos comunes para asegurar coherencia visual y funcional.
 
----
+### 4.1 Barra de navegación
+La barra superior permite acceder rápidamente a:
+- dashboard
+- login
+- ofertas y demandas
+- usuarios
 
-## 5.2 Elementos de la interfaz
-- **Navbar superior**
-  - navegación común
-  - usuario logueado
-  - botón “Cerrar sesión”
-- **Formulario de publicación**
-  - tipo (oferta/demanda)
-  - título
-  - categoría
-  - autor / empresa
-  - ubicación
-  - descripción
-  - email de contacto
-  - botón de guardar
-- **Tabla de publicaciones**
-  - ID
-  - tipo
-  - título
-  - categoría
-  - ubicación
-  - email de contacto
-  - acciones (eliminar)
-- **Zona de mensajes**
-  - éxito / error
+También muestra:
+- el correo del usuario activo si existe sesión
+- el botón de cerrar sesión
+
+### 4.2 Estilo visual homogéneo
+Se ha utilizado Bootstrap 5 como base principal, combinado con estilos personalizados en `styles.css` para conseguir:
+- mejor espaciado
+- tablas más legibles
+- formularios más claros
+- tarjetas más limpias
+- mejor integración visual de los componentes
+
+### 4.3 Mensajes al usuario
+Las interfaces muestran mensajes visuales mediante alertas Bootstrap para informar sobre:
+- errores de validación
+- operaciones correctas
+- errores de almacenamiento
+- confirmaciones de alta o borrado
 
 ---
 
-## 5.3 Comportamiento dinámico (JavaScript)
-- Captura del formulario con `submit`
-- Validación de datos
-- Creación de objeto publicación
-- Inserción en array `publicaciones`
-- Renderizado dinámico de la tabla
-- Eliminación por ID con botones y eventos `click`
-- Diferenciación visual del tipo mediante badges Bootstrap
+## 5. Persistencia e interacción avanzada
+
+Uno de los cambios más importantes del Producto 2 es que las interfaces ya no trabajan solamente con datos en memoria.
+
+### 5.1 localStorage
+Se utiliza para:
+- almacenar usuarios
+- guardar el usuario activo
+- mantener la sesión iniciada
+
+### 5.2 IndexedDB
+Se utiliza para:
+- almacenar ofertas y demandas
+- almacenar la selección del dashboard
+
+### 5.3 Canvas
+Se utiliza en la pantalla de ofertas y demandas para representar gráficamente:
+- número de ofertas
+- número de demandas
+
+### 5.4 Drag and Drop
+Se utiliza en el dashboard para:
+- seleccionar publicaciones
+- deseleccionar publicaciones
+- mantener una interacción más dinámica y visual
 
 ---
 
-## 5.4 Validaciones o controles
-- Todos los campos son obligatorios
-- La descripción debe tener un mínimo de caracteres
-- Si no hay publicaciones, se muestra un mensaje en la tabla
+## 6. Valoración general de las interfaces
 
----
+Las interfaces del Producto 2 presentan una mejora clara respecto al Producto 1, tanto en funcionalidad como en experiencia de usuario. La aplicación resulta más completa, más interactiva y más alineada con los objetivos del enunciado, ya que incorpora persistencia, visualización gráfica y manipulación dinámica de información desde el navegador.
 
-## 6. Interfaz 4 - Gestión de usuarios (`usuarios.html`)
-
-## 6.1 Objetivo
-Permitir la gestión de usuarios del prototipo, incluyendo:
-- alta de usuarios
-- visualización en tabla
-- eliminación de usuarios
-
----
-
-## 6.2 Elementos de la interfaz
-- **Navbar superior**
-  - navegación común
-  - usuario logueado
-  - botón “Cerrar sesión”
-- **Formulario de usuarios**
-  - nombre
-  - apellidos
-  - email
-  - contraseña
-  - rol
-  - botón de guardar
-- **Tabla de usuarios**
-  - ID
-  - nombre completo
-  - email
-  - rol
-  - acciones (eliminar)
-- **Zona de mensajes**
-  - éxito / error
-
----
-
-## 6.3 Comportamiento dinámico (JavaScript)
-- Captura del evento `submit`
-- Validación de datos del formulario
-- Comprobación de email duplicado
-- Inserción del nuevo usuario en el array `usuarios`
-- Renderizado dinámico de la tabla
-- Eliminación por ID con botón por fila
-- Actualización de mensajes y tabla tras cada operación
-
----
-
-## 6.4 Validaciones o controles
-- Todos los campos obligatorios
-- Contraseña con longitud mínima
-- No permite emails repetidos
-- Mensajes visuales de error y confirmación
-
----
-
-## 7. Elementos comunes de interfaz (UX)
-Todas las pantallas comparten una experiencia visual coherente:
-
-- Navbar común
-- Estilos consistentes con Bootstrap y CSS propio
-- Feedback visual con alerts
-- Gestión común de sesión (`ui.js`)
-- Botón de cerrar sesión
-- Diseño responsive
-
-Esto mejora la usabilidad y facilita la navegación entre secciones.
-
----
-
-## 8. Limitaciones del Producto 1
-Estas interfaces forman parte de un prototipo frontend y, por tanto:
-
-- No existe persistencia real de datos
-- No hay backend ni API
-- No hay base de datos
-- No hay control de permisos reales por usuario
-- Los cambios se pierden al recargar la página
-
-Estas limitaciones están previstas en el enunciado del Producto 1.
-
----
-
-## 9. Conclusión
-Las interfaces definidas en este documento cumplen con los requisitos del Producto 1 y permiten simular el comportamiento básico de una plataforma de ofertas y demandas de empleo.
-
-El sistema está preparado para evolucionar en productos posteriores, donde se incorporará persistencia, backend y funcionalidades avanzadas.
+La estructura modular del proyecto también facilita que cada interfaz tenga una responsabilidad bien definida y que el mantenimiento del código sea más sencillo.

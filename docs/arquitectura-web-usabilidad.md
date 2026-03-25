@@ -1,204 +1,199 @@
-# Arquitectura web frontend y usabilidad - Producto 1 (JobConnect)
+# Arquitectura web y usabilidad - Producto 2
 
 ## 1. Introducción
-Este documento describe de forma simple la arquitectura web utilizada en el **Producto 1** del proyecto **JobConnect**, así como los criterios de usabilidad aplicados en el diseño del prototipo.
 
-El Producto 1 está orientado al desarrollo de un **frontend funcional** con:
+El Producto 2 de JobConnect parte de la base visual y estructural construida en el Producto 1, pero introduce una arquitectura más completa y una experiencia de usuario más avanzada gracias al uso de almacenamiento persistente e interacción mediante APIs de HTML5.
+
+La aplicación sigue una organización modular en JavaScript vanilla, donde cada página tiene su propio archivo de lógica y existe un módulo central encargado de la persistencia de datos. Esta arquitectura permite mejorar la claridad del proyecto, la separación de responsabilidades y la escalabilidad futura de la aplicación.
+
+---
+
+## 2. Arquitectura general del proyecto
+
+La arquitectura de JobConnect en el Producto 2 está basada en una separación por capas y responsabilidades.
+
+### 2.1 Capa de presentación
+Está formada por las páginas HTML:
+- `index.html`
+- `login.html`
+- `usuarios.html`
+- `ofertas-demandas.html`
+
+Estas páginas contienen la estructura visual de la aplicación y se apoyan en Bootstrap y CSS personalizado para mostrar la información al usuario.
+
+### 2.2 Capa de lógica por interfaz
+Cada página HTML está asociada a un módulo JavaScript específico:
+- `int_1_dashboard.js`
+- `int_2_login.js`
+- `int_4_usuarios.js`
+- `int_3_empleos.js`
+
+Cada módulo controla la lógica concreta de su pantalla:
+- lectura de formularios
+- validación
+- pintado dinámico
+- interacción del usuario
+- mensajes visuales
+
+### 2.3 Capa de servicios comunes
+El archivo `ui.js` centraliza funciones de interfaz reutilizadas en varias páginas.
+
+Se encarga de:
+- pintar el usuario activo en la navbar
+- mostrar u ocultar el botón de cerrar sesión
+- gestionar el cierre de sesión
+
+### 2.4 Capa de persistencia
+El archivo `almacenaje.js` actúa como núcleo de almacenamiento y acceso a datos.
+
+Gestiona:
+- usuarios
+- sesión activa
+- publicaciones
+- selección del dashboard
+- acceso a `localStorage`
+- acceso a `IndexedDB`
+
+### 2.5 Datos base
+El archivo `datos-iniciales.js` contiene la información inicial de:
+- usuarios
+- publicaciones
+
+Esto permite que la aplicación tenga datos de ejemplo desde el primer uso.
+
+---
+
+## 3. Tecnologías empleadas en la arquitectura
+
+La aplicación utiliza las siguientes tecnologías:
+
 - HTML5
 - CSS3
 - Bootstrap 5
-- JavaScript (ES Modules)
+- JavaScript vanilla
+- localStorage
+- IndexedDB
+- Canvas API
+- Drag and Drop API
+- Git y GitHub
 
-No existe backend ni base de datos en esta fase, por lo que los datos se gestionan en memoria mediante arrays y objetos JavaScript.
-
----
-
-## 2. Arquitectura web frontend aplicada
-
-## 2.1 Tipo de arquitectura utilizada
-En este producto se utiliza una **arquitectura frontend estática con lógica en cliente**, donde:
-
-- La interfaz se compone de varias páginas HTML
-- El estilo se aplica con CSS y Bootstrap
-- La interacción y la lógica se implementan con JavaScript
-- Los datos se almacenan temporalmente en memoria (`datos.js`)
-- No hay servidor de aplicaciones ni API en este producto
-
-Es una arquitectura adecuada para un **prototipo inicial**, ya que permite:
-- validar la interfaz
-- probar la interacción
-- organizar el código
-- preparar la base para futuras mejoras (Producto 2, 3 y 4)
+Cada una de estas tecnologías cumple una función concreta dentro de la arquitectura del sistema.
 
 ---
 
-## 2.2 Estructura modular del frontend
-El proyecto se ha organizado de forma modular para facilitar su mantenimiento:
+## 4. Uso de almacenamiento en el navegador
 
-- `index.html` → dashboard principal
-- `login.html` → acceso de usuario
-- `usuarios.html` → gestión de usuarios
-- `ofertas-demandas.html` → gestión de publicaciones
+Uno de los principales cambios arquitectónicos del Producto 2 es la incorporación de persistencia real en el navegador.
 
-### Archivos JavaScript
-- `datos.js` → datos comunes y funciones auxiliares
-- `dashboard.js` → lógica del dashboard
-- `login.js` → lógica de autenticación (prototipo)
-- `usuarios.js` → alta, listado y baja de usuarios
-- `ofertas-demandas.js` → alta, listado y baja de publicaciones
-- `ui.js` → funciones comunes de sesión y navegación
+### 4.1 localStorage
+Se utiliza para:
+- guardar usuarios
+- guardar el usuario activo
+- mantener la sesión iniciada
 
-Esta separación permite aplicar buenas prácticas de desarrollo:
-- **responsabilidad por archivo**
-- **reutilización de código**
-- **mejor legibilidad**
-- **facilidad de pruebas**
+Ventajas:
+- simplicidad de uso
+- persistencia tras recargar la página
+- adecuado para datos pequeños y directos
 
----
+### 4.2 IndexedDB
+Se utiliza para:
+- almacenar ofertas y demandas
+- almacenar la selección del dashboard
 
-## 2.3 Gestión de datos en el Producto 1
-Los datos se almacenan en arrays de objetos JavaScript dentro de `datos.js`, por ejemplo:
-- usuarios
-- publicaciones (ofertas y demandas)
-
-### Características de esta gestión
-- Los datos se manipulan con JavaScript en memoria
-- No existe persistencia real
-- Al recargar la página, se recuperan los datos iniciales
-- Las altas y bajas son válidas solo durante la ejecución de la página
-
-Este comportamiento está alineado con el enunciado del Producto 1.
+Ventajas:
+- permite manejar estructuras de datos más complejas
+- es más adecuada para colecciones de objetos
+- permite separar la persistencia de publicaciones de la persistencia de usuarios
 
 ---
 
-## 2.4 Flujo general de funcionamiento del prototipo
-1. El usuario abre una de las páginas del sistema.
-2. El navegador carga el HTML, CSS y JS correspondientes.
-3. El script de la página importa datos desde `datos.js`.
-4. JavaScript genera contenido dinámico (tablas, tarjetas, contadores).
-5. El usuario interactúa con formularios y botones.
-6. Los eventos (`submit`, `click`) modifican los arrays en memoria.
-7. La interfaz se actualiza con renderizado dinámico.
+## 5. Uso de APIs HTML5
+
+### 5.1 Canvas
+En `int_3_empleos.js` se utiliza la API Canvas para dibujar un gráfico nativo que representa:
+- el número de ofertas
+- el número de demandas
+
+Esto mejora la comprensión visual de los datos y cumple uno de los requisitos técnicos del Producto 2.
+
+### 5.2 Drag and Drop
+En `int_1_dashboard.js` se usa la API Drag and Drop para:
+- arrastrar publicaciones desde el panel principal
+- soltarlas en la zona de selección
+- deseleccionarlas arrastrándolas de nuevo a la zona principal
+
+Esto añade una interacción más dinámica y mejora la experiencia del usuario.
 
 ---
 
-## 2.5 Preparación para arquitectura futura
-Aunque este producto no tiene backend, el proyecto ya está preparado para evolucionar hacia una arquitectura más completa:
+## 6. Usabilidad de la aplicación
 
-### Futuras mejoras esperadas
-- **Producto 2**: uso de APIs HTML5 y mejoras de interacción
-- **Producto 3**: backend con Node.js, Express, GraphQL y MongoDB
-- **Producto 4**: integración full stack (frontend + backend)
+La aplicación ha sido diseñada teniendo en cuenta criterios básicos de usabilidad.
 
-La organización actual facilita esa evolución porque:
-- la lógica está separada por módulos
-- los datos se concentran en un punto común (`datos.js`)
-- cada pantalla tiene una responsabilidad clara
+### 6.1 Claridad visual
+Se ha buscado que:
+- los títulos sean visibles
+- la estructura sea limpia
+- las tablas sean legibles
+- los formularios estén bien agrupados
+- la navegación sea consistente
 
----
+### 6.2 Consistencia
+Todas las páginas mantienen:
+- la misma barra de navegación
+- la misma línea visual
+- la misma lógica de mensajes
+- el mismo estilo de formularios y botones
 
-## 3. Usabilidad aplicada en el prototipo
+Esto facilita el aprendizaje de la interfaz por parte del usuario.
 
-## 3.1 Objetivo de usabilidad
-El objetivo principal de usabilidad en este producto ha sido crear una interfaz:
-- clara
-- fácil de entender
-- rápida de usar
-- coherente entre pantallas
+### 6.3 Retroalimentación
+El sistema proporciona feedback mediante mensajes visuales cuando:
+- un login falla
+- un usuario se registra correctamente
+- una publicación se elimina
+- una acción no se puede realizar
 
-Dado que se trata de una plataforma de empleo, la usabilidad es importante para que el usuario pueda:
-- consultar información
-- iniciar sesión
-- publicar ofertas/demandas
-- gestionar usuarios
+Esto mejora la comprensión del estado de la aplicación.
 
-sin confusión.
+### 6.4 Persistencia de información
+El hecho de que usuarios, sesión, publicaciones y selección del dashboard permanezcan al recargar la página mejora mucho la experiencia respecto al Producto 1.
 
----
-
-## 3.2 Principios de usabilidad aplicados
-
-### a) Consistencia visual y funcional
-Se ha mantenido una estructura similar en todas las pantallas:
-- barra de navegación superior
-- bloques principales con títulos claros
-- formularios con estilo uniforme
-- tablas/listados con formato Bootstrap
-
-Esto reduce la curva de aprendizaje del usuario.
+### 6.5 Interacción intuitiva
+El uso de arrastrar y soltar en el dashboard y el gráfico visual con Canvas hacen que la aplicación resulte más clara y más cercana a una webapp real.
 
 ---
 
-### b) Feedback inmediato al usuario
-El sistema ofrece respuesta visual después de cada acción mediante mensajes Bootstrap (`alert`):
-- errores de validación
-- login correcto/incorrecto
-- alta de registros
-- eliminación de registros
+## 7. Mejoras respecto al Producto 1
 
-Esto mejora la comprensión del estado del sistema.
+El Producto 2 mejora la arquitectura y la usabilidad del Producto 1 en varios aspectos:
 
----
-
-### c) Formularios claros y sencillos
-Los formularios se han diseñado con:
-- etiquetas descriptivas
-- campos agrupados
-- validaciones básicas
-- estructura ordenada
-
-Así se evita que el usuario introduzca datos incompletos o erróneos.
+- se pasa de datos en memoria a almacenamiento persistente
+- se separan mejor las responsabilidades de los módulos
+- se introduce una capa clara de persistencia
+- se añade representación gráfica con Canvas
+- se incorpora interacción drag and drop
+- se mejora el diseño de la tabla de publicaciones
+- se mejora el comportamiento de la sesión activa
 
 ---
 
-### d) Navegación simple
-Las pantallas principales están claramente separadas:
-- Dashboard
-- Login
-- Gestión de usuarios
-- Gestión de ofertas/demandas
+## 8. Escalabilidad y mantenimiento
 
-Además, se muestra el correo del usuario en sesión para mejorar la orientación del usuario dentro de la aplicación.
+La arquitectura modular del proyecto facilita:
 
----
+- localizar mejor los errores
+- modificar una página sin afectar a las demás
+- ampliar funcionalidad en el futuro
+- preparar el terreno para Productos posteriores
 
-### e) Diseño responsive con Bootstrap
-Se utiliza Bootstrap para garantizar una buena visualización en distintos tamaños de pantalla:
-- uso de contenedores
-- rejilla (`row`, `col`)
-- tablas y formularios adaptados
-- componentes visuales reutilizables
-
-Esto facilita la accesibilidad y la experiencia de uso.
+Esto es importante porque el proyecto puede crecer hacia una arquitectura full stack más completa, donde la persistencia local del navegador pueda ser sustituida o complementada por un backend real.
 
 ---
 
-## 3.3 Usabilidad del login (prototipo)
-Aunque el login del Producto 1 es una simulación, se han aplicado buenas prácticas:
-- validación de campos obligatorios
-- comprobación de credenciales en memoria
-- almacenamiento temporal de sesión en `localStorage`
-- visualización del usuario activo en navbar
-- botón de cerrar sesión
+## 9. Conclusión
 
-Esto permite representar una experiencia realista dentro de las limitaciones del prototipo.
+La arquitectura del Producto 2 de JobConnect está mejor organizada, más modular y más sólida que la del Producto 1. Se ha conseguido una separación razonable entre presentación, lógica de interfaz, servicios comunes y persistencia.
 
----
-
-## 3.4 Limitaciones de usabilidad en esta fase
-Al tratarse de un prototipo inicial, existen limitaciones esperadas:
-- no hay persistencia real
-- no hay control de permisos por usuario
-- no hay conexión entre páginas mediante backend
-- no hay autenticación segura real
-
-Estas limitaciones forman parte del alcance del Producto 1 y se abordarán en productos posteriores.
-
----
-
-## 4. Conclusión
-La arquitectura frontend utilizada en el Producto 1 es adecuada para un prototipo funcional y cumple con los objetivos de aprendizaje del módulo.
-
-Se ha aplicado una estructura modular, clara y escalable, junto con principios básicos de usabilidad que mejoran la experiencia del usuario.
-
-El proyecto queda preparado para evolucionar hacia una solución full stack en fases posteriores, manteniendo una base ordenada y profesional.
+Además, desde el punto de vista de usabilidad, la aplicación resulta más intuitiva, más visual y más útil para el usuario, gracias a la persistencia, al gráfico con Canvas, a la interacción drag and drop y a una mejora general del diseño de la interfaz.
