@@ -1,0 +1,453 @@
+/* =========================================================
+   JobConnect - FULL STACK ATTACK
+   Producto 1 - Estilos personalizados (Bootstrap + mejoras UX/UI)
+   ========================================================= */
+
+/* ---------- Variables visuales ---------- */
+:root {
+  --jc-primary: #0d6efd;
+  --jc-primary-soft: #eaf2ff;
+  --jc-success: #198754;
+  --jc-success-soft: #e9f7ef;
+  --jc-danger: #dc3545;
+  --jc-warning: #ffc107;
+  --jc-dark: #212529;
+  --jc-muted: #6c757d;
+  --jc-bg: #f8f9fa;
+  --jc-border: #e9ecef;
+  --jc-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --jc-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --jc-radius: 12px;
+}
+
+/* ---------- Base general ---------- */
+html,
+body {
+  background-color: var(--jc-bg);
+  color: var(--jc-dark);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Contenedor principal con aire visual */
+main.container,
+.container.py-4,
+.container.py-5 {
+  animation: fadeInPage 0.35s ease-in-out;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Enlaces con transición suave */
+.navbar .nav-link {
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.08);
+}
+
+.navbar .nav-link.active {
+  background-color: rgba(13, 110, 253, 0.12);
+  font-weight: 600;
+}
+
+/* Texto de sesión */
+#usuarioSesionNavbar,
+.usuario-sesion-navbar {
+  font-weight: 500;
+  color: var(--jc-muted);
+}
+
+/* ---------- Títulos y bloques ---------- */
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.page-title {
+  margin-bottom: 1rem;
+}
+
+/* Tarjetas de sección */
+.section-card {
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+  background: #fff;
+  box-shadow: var(--jc-shadow-sm);
+  padding: 1rem;
+}
+
+/* ---------- Cards (dashboard y publicaciones) ---------- */
+.card {
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+  box-shadow: var(--jc-shadow-sm);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--jc-shadow-md);
+  border-color: #dfe6ee;
+}
+
+/* Cabecera de tarjetas */
+.card-title {
+  font-weight: 700;
+}
+
+/* Cards resumen (dashboard) */
+.stats-card,
+.card-resumen {
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card::after,
+.card-resumen::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(13, 110, 253, 0.08);
+}
+
+.stats-card .display-6,
+.card-resumen .display-6 {
+  font-weight: 700;
+}
+
+/* ---------- Badges (oferta / demanda / roles) ---------- */
+/* Si ya usas badges Bootstrap, esto solo mejora su estética */
+.badge {
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.45em 0.75em;
+  letter-spacing: 0.2px;
+}
+
+/* Clases recomendadas para tipo de publicación */
+.badge-oferta {
+  background-color: var(--jc-primary-soft);
+  color: var(--jc-primary);
+  border: 1px solid rgba(13, 110, 253, 0.15);
+}
+
+.badge-demanda {
+  background-color: var(--jc-success-soft);
+  color: var(--jc-success);
+  border: 1px solid rgba(25, 135, 84, 0.15);
+}
+
+/* Roles (si los usas en tabla de usuarios) */
+.badge-rol-candidato {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid rgba(126, 34, 206, 0.15);
+}
+
+.badge-rol-empresa {
+  background-color: #fff4e5;
+  color: #b45309;
+  border: 1px solid rgba(180, 83, 9, 0.15);
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.10);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
+}
+
+/* Botón peligro (eliminar) un poco más claro visualmente */
+.btn-danger {
+  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.14);
+}
+
+/* ---------- Formularios ---------- */
+.form-control,
+.form-select,
+textarea.form-control {
+  border-radius: 10px;
+  border-color: #dce3ea;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: rgba(13, 110, 253, 0.45);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+/* Grupo de formulario */
+.form-section {
+  background: #fff;
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+  box-shadow: var(--jc-shadow-sm);
+  padding: 1rem;
+}
+
+/* ---------- Tablas ---------- */
+.table {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.table thead th {
+  background-color: #f1f5f9;
+  border-bottom: 1px solid #dfe6ee;
+  color: #334155;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8fbff;
+}
+
+/* Contenedor de tabla con estilo */
+.table-container {
+  background: #fff;
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+  box-shadow: var(--jc-shadow-sm);
+  overflow: hidden;
+}
+
+/* ---------- Alerts (feedback visual) ---------- */
+.alert {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  animation: fadeInAlert 0.25s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.alert-success {
+  border-color: rgba(25, 135, 84, 0.18);
+}
+
+.alert-danger {
+  border-color: rgba(220, 53, 69, 0.18);
+}
+
+.alert-warning {
+  border-color: rgba(255, 193, 7, 0.25);
+}
+
+/* ---------- Estado vacío / mensajes informativos ---------- */
+.empty-state,
+.estado-vacio {
+  border: 1px dashed #cfd8e3;
+  background: #ffffff;
+  border-radius: var(--jc-radius);
+  padding: 1rem;
+  color: #64748b;
+}
+
+/* ---------- Dashboard: tarjetas de publicaciones ---------- */
+.publicacion-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.publicacion-card .meta-linea {
+  color: var(--jc-muted);
+  font-size: 0.95rem;
+}
+
+.publicacion-card .descripcion-corta {
+  color: #495057;
+  line-height: 1.45;
+}
+
+/* ---------- Footer (si lo añades más adelante) ---------- */
+footer {
+  color: var(--jc-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Utilidades visuales extra ---------- */
+.shadow-soft {
+  box-shadow: var(--jc-shadow-sm);
+}
+
+.rounded-soft {
+  border-radius: var(--jc-radius);
+}
+
+.border-soft {
+  border: 1px solid var(--jc-border);
+}
+
+/* ---------- Animaciones suaves (para rúbrica) ---------- */
+@keyframes fadeInPage {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInAlert {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 992px) {
+  .navbar .d-flex.gap-2,
+  .navbar .d-flex.align-items-center.gap-2 {
+    margin-top: 0.5rem;
+  }
+
+  .card:hover {
+    transform: none; /* en pantallas táctiles evita efecto extraño */
+    box-shadow: var(--jc-shadow-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    font-size: 0.92rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .btn + .btn {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ---------- Secciones principales usadas en producto 2 ---------- */
+.seccion-formulario,
+.seccion-listado {
+  background: #fff;
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+  box-shadow: var(--jc-shadow-sm);
+  padding: 1.25rem;
+}
+
+.drop-zone {
+  background: #fff;
+  border: 2px dashed #cfd8e3;
+  border-radius: var(--jc-radius);
+  min-height: 320px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.drop-zone-activa {
+  border-color: var(--jc-primary);
+  background-color: rgba(13, 110, 253, 0.04);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.08);
+}
+
+.drop-zone-destino {
+  border-color: rgba(25, 135, 84, 0.35);
+}
+
+.tarjeta-arrastrable {
+  cursor: grab;
+}
+
+.tarjeta-dragging {
+  opacity: 0.55;
+  transform: rotate(1deg);
+}
+
+.canvas-panel {
+  width: 100%;
+  max-width: 100%;
+  background: #fff;
+  border: 1px solid var(--jc-border);
+  border-radius: var(--jc-radius);
+}
+
+footer {
+  padding: 1rem 0 2rem;
+  color: var(--jc-muted);
+}
+
+@keyframes fadeInPage {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
