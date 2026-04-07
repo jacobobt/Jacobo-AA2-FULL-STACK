@@ -162,6 +162,7 @@ function abrirBaseDeDatos() {
 
 /*
   Lee TODOS los registros de un object store de IndexedDB.
+  “Ve a ese almacén y tráeme todo lo que haya dentro.”
 
   Ejemplo:
   - obtenerTodosDeStore("publicaciones")
@@ -170,12 +171,17 @@ function abrirBaseDeDatos() {
 function obtenerTodosDeStore(nombreStore) {
   return new Promise(async (resolve, reject) => {
     try {
+      //“Espera a que se abra la base de datos y guarda esa base en db.”
       const db = await abrirBaseDeDatos();
+      //“Crea una transacción de solo lectura sobre el store indicado.”
       const transaccion = db.transaction(nombreStore, "readonly");
+      //“Dentro de la transacción, obtén el store sobre el que quiero trabajar.”
       const store = transaccion.objectStore(nombreStore);
+      //“dame todos los registros de este store”
       const peticion = store.getAll();
 
-      peticion.onsuccess = () => resolve(peticion.result);
+      //“Si la lectura sale bien, devuelve todos los registros obtenidos.” El resultado esta en peticion.result
+      peticion.onsuccess = () => resolve(peticion.result);//resolve(...)la promesa principal devuelva ese resultado.
       peticion.onerror = () => reject(new Error(`No se pudo leer ${nombreStore}.`));
     } catch (error) {
       reject(error);
@@ -198,6 +204,7 @@ function obtenerUnoDeStore(nombreStore, clave) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.get(clave);
 
+      //Si no encuentra nada:peticion.result puede venir vacío / undefined entonces devuelve null
       peticion.onsuccess = () => resolve(peticion.result || null);
       peticion.onerror = () => reject(new Error(`No se pudo leer el registro de ${nombreStore}.`));
     } catch (error) {
@@ -240,11 +247,13 @@ function agregarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
     try {
       const db = await abrirBaseDeDatos();
+      //ojo ya es readwrite porque vamos a modificar datos
       const transaccion = db.transaction(nombreStore, "readwrite");
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.add(dato);
 
-      peticion.onsuccess = () => resolve(peticion.result);
+      peticion.onsuccess = () => resolve(peticion.result);//En un store con autoIncrement, el resultado suele ser la clave generada.
+      //ej: const nuevoId = await agregarEnStore(STORE_PUBLICACIONES, nuevaPublicacion);
       peticion.onerror = () => reject(new Error(`No se pudo guardar en ${nombreStore}.`));
     } catch (error) {
       reject(error);
@@ -261,6 +270,14 @@ function agregarEnStore(nombreStore, dato) {
 
   Es muy útil cuando queremos "dejar guardado" algo sin preocuparnos
   de si ya estaba antes o no.
+
+  add(...) → añadir nuevo
+  put(...) → guardar/actualizar
+
+  En muchos contextos:
+
+  add falla si ya existe esa clave
+  put puede insertar o sobrescribir
 */
 function guardarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
@@ -280,6 +297,11 @@ function guardarEnStore(nombreStore, dato) {
 
 /*
   Elimina un registro del store por su clave.
+  Se usa para:
+
+  borrar publicaciones
+  borrar seleccionadas
+  quitar una publicación del área seleccionada del dashboard
 */
 function eliminarDeStore(nombreStore, clave) {
   return new Promise(async (resolve, reject) => {
@@ -289,6 +311,7 @@ function eliminarDeStore(nombreStore, clave) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.delete(clave);
 
+      //Simplemente devuelve true para indicar que fue bien.
       peticion.onsuccess = () => resolve(true);
       peticion.onerror = () => reject(new Error(`No se pudo eliminar en ${nombreStore}.`));
     } catch (error) {
@@ -303,6 +326,9 @@ function eliminarDeStore(nombreStore, clave) {
   Se encarga de:
   1. asegurarse de que existan usuarios iniciales en localStorage
   2. asegurarse de que existan publicaciones iniciales en IndexedDB
+
+  “Antes de empezar a trabajar, comprueba si ya hay datos guardados. 
+  Si no los hay, mete los datos iniciales.”
 */
 export async function inicializarAlmacenamiento() {
   inicializarUsuariosSiNoExisten();
