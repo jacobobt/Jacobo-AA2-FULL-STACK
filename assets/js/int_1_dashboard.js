@@ -14,6 +14,8 @@ const totalUsuariosElemento = document.getElementById("total-usuarios");
 const totalSeleccionadasElemento = document.getElementById("total-seleccionadas");
 const contenedorDisponibles = document.getElementById("contenedor-publicaciones");
 const contenedorSeleccionadas = document.getElementById("contenedor-seleccionadas");
+const zonaDisponibles = contenedorDisponibles.closest(".drop-zone");
+const zonaSeleccionadas = contenedorSeleccionadas.closest(".drop-zone");
 const mensajeDashboard = document.getElementById("mensaje-dashboard");
 const botonesFiltro = document.querySelectorAll("[data-filtro]");
 
@@ -51,20 +53,23 @@ function actualizarEstadoVisualFiltros() {
 }
 
 function configurarZonasDrop() {
-  [contenedorDisponibles, contenedorSeleccionadas].forEach((zona) => {
+  [zonaDisponibles, zonaSeleccionadas].forEach((zona) => {
     zona.addEventListener("dragover", (evento) => {
       evento.preventDefault();
       zona.classList.add("drop-zone-activa");
     });
 
-    zona.addEventListener("dragleave", () => {
-      zona.classList.remove("drop-zone-activa");
+    zona.addEventListener("dragleave", (evento) => {
+      if (!zona.contains(evento.relatedTarget)) {
+        zona.classList.remove("drop-zone-activa");
+      }
     });
   });
 
-  contenedorDisponibles.addEventListener("drop", async (evento) => {
+  zonaDisponibles.addEventListener("drop", async (evento) => {
     evento.preventDefault();
-    contenedorDisponibles.classList.remove("drop-zone-activa");
+    zonaDisponibles.classList.remove("drop-zone-activa");
+
     const id = evento.dataTransfer.getData("text/plain");
 
     try {
@@ -76,9 +81,10 @@ function configurarZonasDrop() {
     }
   });
 
-  contenedorSeleccionadas.addEventListener("drop", async (evento) => {
+  zonaSeleccionadas.addEventListener("drop", async (evento) => {
     evento.preventDefault();
-    contenedorSeleccionadas.classList.remove("drop-zone-activa");
+    zonaSeleccionadas.classList.remove("drop-zone-activa");
+
     const id = evento.dataTransfer.getData("text/plain");
 
     try {
