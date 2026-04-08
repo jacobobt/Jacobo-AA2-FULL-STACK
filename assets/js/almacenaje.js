@@ -329,6 +329,19 @@ function eliminarDeStore(nombreStore, clave) {
 
   “Antes de empezar a trabajar, comprueba si ya hay datos guardados. 
   Si no los hay, mete los datos iniciales.”
+  En Producto 1
+
+  datos.js era la fuente principal.
+
+  En Producto 2
+
+  datos.js ya no es la fuente principal.
+  Ahora solo sirve como semilla inicial.
+
+  Y luego la fuente real pasa a ser:
+
+  localStorage para usuarios
+  IndexedDB para publicaciones
 */
 export async function inicializarAlmacenamiento() {
   inicializarUsuariosSiNoExisten();
@@ -360,6 +373,11 @@ async function inicializarPublicacionesSiNoExisten() {
   }
 
   // Si no hay publicaciones, añadimos las iniciales una por una.
+  // No podemos usar un bucle forEach con async/await, así que usamos un for...of normal.
+  //de una en una porque indexDB lo implementamos con add(dato) y no mete todo el array de golpe, 
+  // sino que hay que ir añadiendo uno a uno. 
+  // Si lo intentamos meter todo el array de golpe, 
+  // no va a funcionar porque add() espera un solo objeto, no un array.
   for (const publicacion of publicacionesIniciales) {
     await agregarEnStore(STORE_PUBLICACIONES, publicacion);
   }
@@ -495,8 +513,9 @@ export function eliminarUsuario(email) {
     throw new Error("No se encontró el usuario a eliminar.");
   }
 
-  guardarJSONStorage(CLAVES_STORAGE.usuarios, usuariosFiltrados);
+  guardarJSONStorage(CLAVES_STORAGE.usuarios, usuariosFiltrados);//Sobrescribe el array antiguo con el nuevo array sin ese usuario.
 
+  //Si borras al usuario que estaba logueado, también se cierra la sesión.
   const usuarioActivo = obtenerUsuarioActivo();
   if (usuarioActivo && usuarioActivo.email === emailNormalizado) {
     cerrarSesion();
@@ -586,7 +605,7 @@ export async function crearPublicacion(datosPublicacion) {
   if (descripcion.length < 10) {
     throw new Error("La descripción debe tener al menos 10 caracteres.");
   }
-
+  //No pone id porque lo genera IndexedDB con autoIncrement.
   const nuevaPublicacion = {
     tipo,
     titulo,
@@ -603,7 +622,9 @@ export async function crearPublicacion(datosPublicacion) {
     Luego devolvemos el objeto completo con ese id añadido.
   */
   const nuevoId = await agregarEnStore(STORE_PUBLICACIONES, nuevaPublicacion);
-  return { ...nuevaPublicacion, id: nuevoId };
+  return { ...nuevaPublicacion, id: nuevoId };//...nuevaPublicacion copia todas las propiedades del objeto nuevaPublicacion 
+  // y luego id:nuevoId añade esa propiedad id al nuevo objeto que se devuelve. 
+  // Así el objeto resultante tiene todas las propiedades de nuevaPublicacion más la propiedad id con el valor generado por IndexedDB.
 }
 
 /*
@@ -613,8 +634,10 @@ export async function crearPublicacion(datosPublicacion) {
   por si estaba arrastrada/seleccionada en el dashboard.
 */
 export async function eliminarPublicacion(idPublicacion) {
+  //Muy importante porque en frontend muchas veces los ids vienen como string
   const id = Number(idPublicacion);
 
+  //Valida que el id sea un entero válido.
   if (!Number.isInteger(id)) {
     throw new Error("El identificador de la publicación no es válido.");
   }
