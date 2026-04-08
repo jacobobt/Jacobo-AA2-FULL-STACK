@@ -655,7 +655,7 @@ export async function eliminarPublicacion(idPublicacion) {
 
 /*
   Devuelve solo los ids de las publicaciones seleccionadas
-  en el dashboard.
+  en el dashboard.Lee todas las selecciones del dashboard y devuelve solo sus ids.
 */
 export async function listarIdsSeleccionados() {
   const registros = await obtenerTodosDeStore(STORE_SELECCIONADAS);
@@ -671,6 +671,19 @@ export async function listarIdsSeleccionados() {
   - fechaSeleccion
 
   Así sabemos qué publicación fue seleccionada y cuándo.
+
+  ¿Por qué guardarEnStore y no agregarEnStore?
+
+  Porque STORE_SELECCIONADAS usa:
+
+  keyPath: "publicacionId"
+
+  Entonces put viene bien para:
+
+  insertar si no estaba
+  actualizar si ya estaba
+
+  Así no da problemas si el usuario intenta volver a soltar la misma publicación.
 */
 export async function anadirPublicacionSeleccionada(idPublicacion) {
   const id = Number(idPublicacion);
@@ -704,6 +717,9 @@ export async function quitarPublicacionSeleccionada(idPublicacion) {
   1. lee todas las publicaciones
   2. lee los ids seleccionados
   3. filtra las publicaciones cuyo id esté en la lista de seleccionados
+  cuando una tarjeta vuelva al área de disponibles o cuando se quite de la selección.
+
+  Conecta directamente con drag & drop.
 */
 export async function listarPublicacionesSeleccionadas() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
@@ -727,18 +743,19 @@ export async function listarPublicacionesDisponibles() {
 }
 
 /*
-  Devuelve un resumen para el dashboard:
-  - total de ofertas
-  - total de demandas
-  - total de usuarios
-  - total de seleccionadas
+  Devuelve un objeto con los números resumen del dashboard:
+
+    cuántas ofertas hay
+    cuántas demandas hay
+    cuántos usuarios hay
+    cuántas publicaciones están seleccionadas
 */
 export async function obtenerResumenDashboard() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
     listarPublicaciones(),
     listarIdsSeleccionados()
   ]);
-
+  //objeto resumen con los números que se muestran en el dashboard.
   return {
     totalOfertas: publicaciones.filter((publicacion) => publicacion.tipo === "oferta").length,
     totalDemandas: publicaciones.filter((publicacion) => publicacion.tipo === "demanda").length,
