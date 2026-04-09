@@ -293,6 +293,32 @@ function configurarZonasDrop() {
 }
 
 /*
+  Mueve una publicación al bloque de seleccionadas usando doble clic.
+*/
+async function moverASeleccionadas(idPublicacion) {
+  try {
+    await anadirPublicacionSeleccionada(idPublicacion);
+    await repintarDashboard();
+    mostrarAlerta(mensajeDashboard, "Publicación añadida a la selección del usuario.", "success");
+  } catch (error) {
+    mostrarAlerta(mensajeDashboard, error.message, "danger");
+  }
+}
+
+/*
+  Devuelve una publicación al bloque de disponibles usando doble clic.
+*/
+async function moverADisponibles(idPublicacion) {
+  try {
+    await quitarPublicacionSeleccionada(idPublicacion);
+    await repintarDashboard();
+    mostrarAlerta(mensajeDashboard, "Publicación devuelta al listado general.", "success");
+  } catch (error) {
+    mostrarAlerta(mensajeDashboard, error.message, "danger");
+  }
+}
+
+/*
   Repinta todo el dashboard.
 
   Reutiliza:
@@ -352,7 +378,8 @@ async function pintarTarjetas() {
   renderizarTarjetas(
     contenedorDisponibles,
     disponiblesFiltradas,
-    "No hay publicaciones disponibles en este bloque."
+    "No hay publicaciones disponibles en este bloque.",
+    "disponibles"
   );
 
   /*
@@ -361,7 +388,8 @@ async function pintarTarjetas() {
   renderizarTarjetas(
     contenedorSeleccionadas,
     publicacionesSeleccionadas,
-    "Arrastra aquí las publicaciones que quieras guardar."
+    "Arrastra aquí las publicaciones que quieras guardar.",
+    "seleccionadas"
   );
 }
 
@@ -372,8 +400,10 @@ async function pintarTarjetas() {
   - contenedor: dónde se van a insertar las tarjetas
   - publicaciones: array de publicaciones a mostrar
   - textoVacio: mensaje que se mostrará si no hay elementos
+  - origen: indica si la tarjeta pertenece al bloque de disponibles
+    o al bloque de seleccionadas
 */
-function renderizarTarjetas(contenedor, publicaciones, textoVacio) {
+function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
   /*
     Si no hay publicaciones, mostramos un mensaje
     dentro del contenedor.
@@ -461,6 +491,21 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio) {
     */
     tarjeta.addEventListener("dragend", () => {
       tarjeta.classList.remove("tarjeta-dragging");
+    });
+
+    /*
+      Mejora funcional:
+      además del drag & drop, permitimos mover la tarjeta con doble clic.
+
+      - Si la tarjeta está en "disponibles", pasa a "seleccionadas"
+      - Si la tarjeta está en "seleccionadas", vuelve a "disponibles"
+    */
+    tarjeta.addEventListener("dblclick", async () => {
+      if (origen === "disponibles") {
+        await moverASeleccionadas(publicacion.id);
+      } else {
+        await moverADisponibles(publicacion.id);
+      }
     });
 
     /*
