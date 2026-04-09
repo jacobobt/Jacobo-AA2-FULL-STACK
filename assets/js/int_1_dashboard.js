@@ -9,6 +9,12 @@ import {
 import { capitalizarTexto, configurarBotonCerrarSesion, mostrarAlerta, pintarUsuarioEnNavbar } from "./ui.js";
 
 /*
+  Clave usada en localStorage para recordar qué filtro del dashboard
+  estaba activo la última vez.
+*/
+const CLAVE_FILTRO_DASHBOARD = "jobconnect_dashboard_filtro";
+
+/*
   Referencias a elementos del HTML que vamos a usar en el dashboard.
 
   Estos cuatro muestran los números del resumen superior:
@@ -33,9 +39,8 @@ const contenedorSeleccionadas = document.getElementById("contenedor-seleccionada
 /*
   closest(".drop-zone") busca el ancestro más cercano que tenga la clase .drop-zone.
 
-  Esto es importante en la mejora:
-  antes el drag and drop trabajaba directamente sobre los contenedores internos,
-  pero ahora trabajas sobre la zona completa visual del drop.
+  Esto es importante porque el drag and drop se apoya en la zona visual completa,
+  no solo en el contenedor interno de tarjetas.
 
   Así:
   - el área de drop es más grande
@@ -53,13 +58,13 @@ const mensajeDashboard = document.getElementById("mensaje-dashboard");
 /*
   Lista de botones de filtro.
   Se seleccionan con querySelectorAll porque puede haber varios.
-  Devuelve una NodeList.
 */
 const botonesFiltro = document.querySelectorAll("[data-filtro]");
 
 /*
   Guarda qué filtro está activo en este momento.
-  Empieza en "todas", así que inicialmente se ven todas las publicaciones.
+  Empieza en "todas", pero luego intentaremos recuperar
+  el último valor guardado en localStorage.
 */
 let filtroActual = "todas";
 
@@ -70,17 +75,44 @@ let filtroActual = "todas";
   1. prepara el almacenamiento inicial
   2. pinta el usuario activo en la navbar
   3. configura el botón de cerrar sesión
-  4. configura los filtros
-  5. configura las zonas de drag and drop
-  6. pinta el resumen y las tarjetas
+  4. recupera el filtro guardado
+  5. configura los filtros
+  6. configura las zonas de drag and drop
+  7. pinta el resumen y las tarjetas
 */
 async function inicializarDashboard() {
   await inicializarAlmacenamiento();
   pintarUsuarioEnNavbar();
   configurarBotonCerrarSesion();
+  recuperarFiltroGuardado();
+  actualizarEstadoVisualFiltros();
   configurarFiltros();
   configurarZonasDrop();
   await repintarDashboard();
+}
+
+/*
+  Recupera desde localStorage el último filtro usado por el usuario.
+
+  Si el valor guardado no es válido, se mantiene "todas".
+*/
+function recuperarFiltroGuardado() {
+  const filtroGuardado = localStorage.getItem(CLAVE_FILTRO_DASHBOARD);
+
+  if (
+    filtroGuardado === "todas"
+    || filtroGuardado === "oferta"
+    || filtroGuardado === "demanda"
+  ) {
+    filtroActual = filtroGuardado;
+  }
+}
+
+/*
+  Guarda en localStorage el filtro actual del dashboard.
+*/
+function guardarFiltroActual() {
+  localStorage.setItem(CLAVE_FILTRO_DASHBOARD, filtroActual);
 }
 
 /*
@@ -89,6 +121,7 @@ async function inicializarDashboard() {
   Por cada botón:
   - escucha el click
   - actualiza filtroActual según su data-filtro
+  - guarda el filtro elegido
   - cambia el aspecto visual de los botones
   - vuelve a pintar las tarjetas
 */
@@ -96,6 +129,7 @@ function configurarFiltros() {
   botonesFiltro.forEach((boton) => {
     boton.addEventListener("click", async () => {
       filtroActual = boton.dataset.filtro;
+      guardarFiltroActual();
       actualizarEstadoVisualFiltros();
       await pintarTarjetas();
     });
@@ -154,10 +188,7 @@ function configurarZonasDrop() {
 
     zona.addEventListener("dragleave", (evento) => {
       /*
-        Esta es la mejora importante.
-
-        Antes, al salir de cualquier parte interna de la zona,
-        podía quitarse el resaltado incluso aunque el cursor siguiera dentro.
+        Esta mejora evita que el resaltado se quite antes de tiempo.
 
         evento.relatedTarget es el elemento al que se mueve el puntero.
         Si ese nuevo elemento sigue estando dentro de la misma zona,
@@ -318,12 +349,20 @@ async function pintarTarjetas() {
     Pintamos tarjetas en la zona de disponibles.
     Si no hay publicaciones, se mostrará el texto vacío.
   */
-  renderizarTarjetas(contenedorDisponibles, disponiblesFiltradas, "No hay publicaciones disponibles en este bloque.");
+  renderizarTarjetas(
+    contenedorDisponibles,
+    disponiblesFiltradas,
+    "No hay publicaciones disponibles en este bloque."
+  );
 
   /*
     Pintamos tarjetas en la zona de seleccionadas.
   */
-  renderizarTarjetas(contenedorSeleccionadas, publicacionesSeleccionadas, "Arrastra aquí las publicaciones que quieras guardar.");
+  renderizarTarjetas(
+    contenedorSeleccionadas,
+    publicacionesSeleccionadas,
+    "Arrastra aquí las publicaciones que quieras guardar."
+  );
 }
 
 /*
@@ -373,7 +412,7 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio) {
       permite que la tarjeta se pueda arrastrar.
 
       data-id guarda el id en el HTML,
-      aunque en este caso el valor importante luego se mete en dataTransfer.
+      aunque el valor importante luego se mete en dataTransfer.
     */
     columna.innerHTML = `
       <article class="card card-publicacion h-100 tarjeta-arrastrable" draggable="true" data-id="${publicacion.id}">
