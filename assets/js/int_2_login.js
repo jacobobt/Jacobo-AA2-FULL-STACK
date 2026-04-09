@@ -23,6 +23,12 @@ const usuarioActivoPagina = document.getElementById("usuario-activo-pagina");
 const TIEMPO_REDIRECCION_LOGIN = 1200;
 
 /*
+  Tiempo de espera antes de redirigir al dashboard
+  si el usuario ya tenía una sesión activa al entrar en login.
+*/
+const TIEMPO_REDIRECCION_SESION_ACTIVA = 1500;
+
+/*
   Función principal de arranque de la página login.
 
   Flujo:
@@ -30,7 +36,8 @@ const TIEMPO_REDIRECCION_LOGIN = 1200;
   2. pinta el usuario activo en la navbar
   3. configura el botón de cerrar sesión
   4. muestra en esta página el usuario activo actual
-  5. conecta el formulario con la función que gestiona el login
+  5. si ya hay sesión activa, redirige al dashboard
+  6. si no la hay, conecta el formulario con la función que gestiona el login
 */
 async function inicializarPaginaLogin() {
   await inicializarAlmacenamiento();
@@ -39,10 +46,46 @@ async function inicializarPaginaLogin() {
   mostrarUsuarioActivoEnPagina();
 
   /*
-    Cuando el usuario envía el formulario de login,
-    se ejecuta la función gestionarLogin.
+    Mejora funcional:
+    si el usuario ya estaba logueado antes de entrar en login,
+    no tiene sentido volver a iniciar sesión.
+  */
+  const usuarioActivo = obtenerUsuarioActivo();
+
+  if (usuarioActivo) {
+    desactivarFormularioLogin();
+
+    mostrarAlerta(
+      mensajeLogin,
+      `Ya hay una sesión activa con ${usuarioActivo.nombre}. Redirigiendo al dashboard...`,
+      "info",
+      TIEMPO_REDIRECCION_SESION_ACTIVA
+    );
+
+    window.setTimeout(redirigirAlDashboard, TIEMPO_REDIRECCION_SESION_ACTIVA);
+    return;
+  }
+
+  /*
+    Si no hay sesión activa, permitimos usar el formulario normalmente.
   */
   formLogin.addEventListener("submit", gestionarLogin);
+}
+
+/*
+  Desactiva temporalmente el formulario de login.
+
+  Esto se usa cuando ya existe una sesión activa para evitar
+  que el usuario interactúe con el formulario antes de ser redirigido.
+*/
+function desactivarFormularioLogin() {
+  inputEmail.disabled = true;
+  inputPassword.disabled = true;
+
+  const botonSubmit = formLogin.querySelector('button[type="submit"]');
+  if (botonSubmit) {
+    botonSubmit.disabled = true;
+  }
 }
 
 /*
@@ -140,7 +183,8 @@ async function gestionarLogin(evento) {
     mostrarAlerta(
       mensajeLogin,
       `Inicio de sesión correcto. Bienvenido/a, ${usuario.nombre}. Redirigiendo al dashboard...`,
-      "success"
+      "success",
+      TIEMPO_REDIRECCION_LOGIN
     );
 
     /*
@@ -149,8 +193,7 @@ async function gestionarLogin(evento) {
     formLogin.reset();
 
     /*
-      Mejora funcional:
-      tras un login correcto, redirigimos automáticamente
+      Tras un login correcto, redirigimos automáticamente
       al usuario al dashboard principal.
     */
     window.setTimeout(redirigirAlDashboard, TIEMPO_REDIRECCION_LOGIN);
