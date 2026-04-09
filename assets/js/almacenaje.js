@@ -7,7 +7,8 @@ import { usuariosIniciales, publicacionesIniciales } from "./datos.js";
 */
 const CLAVES_STORAGE = {
   usuarios: "jobconnect_usuarios",
-  usuarioActivo: "jobconnect_usuario_activo"
+  usuarioActivo: "jobconnect_usuario_activo",
+  publicacionesInicializadas: "jobconnect_publicaciones_inicializadas"
 };
 
 /*
@@ -125,8 +126,8 @@ function abrirBaseDeDatos() {
       // Si no existe el store de publicaciones, lo creamos.
       if (!db.objectStoreNames.contains(STORE_PUBLICACIONES)) {
         const storePublicaciones = db.createObjectStore(STORE_PUBLICACIONES, {
-          keyPath: "id",       // la clave principal será la propiedad "id"
-          autoIncrement: true  // el id se generará automáticamente
+          keyPath: "id",
+          autoIncrement: true
         });
 
         /*
@@ -171,17 +172,12 @@ function abrirBaseDeDatos() {
 function obtenerTodosDeStore(nombreStore) {
   return new Promise(async (resolve, reject) => {
     try {
-      //“Espera a que se abra la base de datos y guarda esa base en db.”
       const db = await abrirBaseDeDatos();
-      //“Crea una transacción de solo lectura sobre el store indicado.”
       const transaccion = db.transaction(nombreStore, "readonly");
-      //“Dentro de la transacción, obtén el store sobre el que quiero trabajar.”
       const store = transaccion.objectStore(nombreStore);
-      //“dame todos los registros de este store”
       const peticion = store.getAll();
 
-      //“Si la lectura sale bien, devuelve todos los registros obtenidos.” El resultado esta en peticion.result
-      peticion.onsuccess = () => resolve(peticion.result);//resolve(...)la promesa principal devuelva ese resultado.
+      peticion.onsuccess = () => resolve(peticion.result);
       peticion.onerror = () => reject(new Error(`No se pudo leer ${nombreStore}.`));
     } catch (error) {
       reject(error);
@@ -204,7 +200,6 @@ function obtenerUnoDeStore(nombreStore, clave) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.get(clave);
 
-      //Si no encuentra nada:peticion.result puede venir vacío / undefined entonces devuelve null
       peticion.onsuccess = () => resolve(peticion.result || null);
       peticion.onerror = () => reject(new Error(`No se pudo leer el registro de ${nombreStore}.`));
     } catch (error) {
@@ -247,13 +242,11 @@ function agregarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
     try {
       const db = await abrirBaseDeDatos();
-      //ojo ya es readwrite porque vamos a modificar datos
       const transaccion = db.transaction(nombreStore, "readwrite");
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.add(dato);
 
-      peticion.onsuccess = () => resolve(peticion.result);//En un store con autoIncrement, el resultado suele ser la clave generada.
-      //ej: const nuevoId = await agregarEnStore(STORE_PUBLICACIONES, nuevaPublicacion);
+      peticion.onsuccess = () => resolve(peticion.result);
       peticion.onerror = () => reject(new Error(`No se pudo guardar en ${nombreStore}.`));
     } catch (error) {
       reject(error);
@@ -273,11 +266,6 @@ function agregarEnStore(nombreStore, dato) {
 
   add(...) → añadir nuevo
   put(...) → guardar/actualizar
-
-  En muchos contextos:
-
-  add falla si ya existe esa clave
-  put puede insertar o sobrescribir
 */
 function guardarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
@@ -298,10 +286,9 @@ function guardarEnStore(nombreStore, dato) {
 /*
   Elimina un registro del store por su clave.
   Se usa para:
-
-  borrar publicaciones
-  borrar seleccionadas
-  quitar una publicación del área seleccionada del dashboard
+  - borrar publicaciones
+  - borrar seleccionadas
+  - quitar una publicación del área seleccionada del dashboard
 */
 function eliminarDeStore(nombreStore, clave) {
   return new Promise(async (resolve, reject) => {
@@ -311,7 +298,6 @@ function eliminarDeStore(nombreStore, clave) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.delete(clave);
 
-      //Simplemente devuelve true para indicar que fue bien.
       peticion.onsuccess = () => resolve(true);
       peticion.onerror = () => reject(new Error(`No se pudo eliminar en ${nombreStore}.`));
     } catch (error) {
@@ -327,21 +313,8 @@ function eliminarDeStore(nombreStore, clave) {
   1. asegurarse de que existan usuarios iniciales en localStorage
   2. asegurarse de que existan publicaciones iniciales en IndexedDB
 
-  “Antes de empezar a trabajar, comprueba si ya hay datos guardados. 
-  Si no los hay, mete los datos iniciales.”
-  En Producto 1
-
-  datos.js era la fuente principal.
-
-  En Producto 2
-
-  datos.js ya no es la fuente principal.
-  Ahora solo sirve como semilla inicial.
-
-  Y luego la fuente real pasa a ser:
-
-  localStorage para usuarios
-  IndexedDB para publicaciones
+  En Producto 2, datos.js ya no es la fuente principal.
+  Solo actúa como semilla inicial.
 */
 export async function inicializarAlmacenamiento() {
   inicializarUsuariosSiNoExisten();
@@ -359,28 +332,36 @@ function inicializarUsuariosSiNoExisten() {
 }
 
 /*
-  Si todavía no hay publicaciones guardadas en IndexedDB,
-  insertamos las publicaciones iniciales.
+  Inserta las publicaciones iniciales solo una vez.
 
-  Esto se hace una sola vez.
+  Antes, si el store quedaba vacío porque el usuario borraba todas las
+  publicaciones manualmente, al refrescar se volvían a insertar.
+  Ahora evitamos eso guardando una marca en localStorage.
+
+  Así:
+  - la primera vez se cargan las publicaciones iniciales
+  - después ya no se vuelven a sembrar, aunque el store quede vacío
 */
 async function inicializarPublicacionesSiNoExisten() {
-  const totalPublicaciones = await contarStore(STORE_PUBLICACIONES);
+  const yaInicializadas =
+    localStorage.getItem(CLAVES_STORAGE.publicacionesInicializadas) === "true";
 
-  // Si ya hay publicaciones, no hacemos nada.
-  if (totalPublicaciones > 0) {
+  // Si ya se cargaron una vez, no volvemos a insertarlas.
+  if (yaInicializadas) {
     return;
   }
 
-  // Si no hay publicaciones, añadimos las iniciales una por una.
-  // No podemos usar un bucle forEach con async/await, así que usamos un for...of normal.
-  //de una en una porque indexDB lo implementamos con add(dato) y no mete todo el array de golpe, 
-  // sino que hay que ir añadiendo uno a uno. 
-  // Si lo intentamos meter todo el array de golpe, 
-  // no va a funcionar porque add() espera un solo objeto, no un array.
-  for (const publicacion of publicacionesIniciales) {
-    await agregarEnStore(STORE_PUBLICACIONES, publicacion);
+  const totalPublicaciones = await contarStore(STORE_PUBLICACIONES);
+
+  // Solo sembramos si de verdad no hay publicaciones guardadas.
+  if (totalPublicaciones === 0) {
+    for (const publicacion of publicacionesIniciales) {
+      await agregarEnStore(STORE_PUBLICACIONES, publicacion);
+    }
   }
+
+  // Marcamos que la siembra inicial ya se realizó.
+  localStorage.setItem(CLAVES_STORAGE.publicacionesInicializadas, "true");
 }
 
 /*
@@ -449,33 +430,24 @@ export function crearUsuario(datosUsuario) {
   const password = normalizarTexto(datosUsuario.password);
   const rol = normalizarTexto(datosUsuario.rol);
 
-  // Validación: ningún campo puede quedar vacío.
   if (!nombre || !apellidos || !email || !password || !rol) {
     throw new Error("Todos los campos del usuario son obligatorios.");
   }
 
-  // Validación simple de email.
   if (!email.includes("@")) {
     throw new Error("El correo electrónico no tiene un formato válido.");
   }
 
-  // Validación simple de contraseña.
   if (password.length < 4) {
     throw new Error("La contraseña debe tener al menos 4 caracteres.");
   }
 
-  // Comprobamos si ya existe un usuario con ese email.
   const usuarioDuplicado = usuarios.some((usuario) => usuario.email === email);
 
   if (usuarioDuplicado) {
     throw new Error("Ya existe un usuario con ese correo electrónico.");
   }
 
-  /*
-    Calculamos el siguiente id manualmente.
-    Si no hay usuarios, empezamos en 1.
-    Si ya hay, buscamos el id mayor y sumamos 1.
-  */
   const siguienteId = usuarios.length === 0
     ? 1
     : Math.max(...usuarios.map((usuario) => Number(usuario.id) || 0)) + 1;
@@ -505,17 +477,14 @@ export function eliminarUsuario(email) {
   const emailNormalizado = normalizarEmail(email);
   const usuarios = listarUsuarios();
 
-  // Creamos un nuevo array sin el usuario a eliminar.
   const usuariosFiltrados = usuarios.filter((usuario) => usuario.email !== emailNormalizado);
 
-  // Si no cambia el tamaño del array, es que no se encontró el usuario.
   if (usuariosFiltrados.length === usuarios.length) {
     throw new Error("No se encontró el usuario a eliminar.");
   }
 
-  guardarJSONStorage(CLAVES_STORAGE.usuarios, usuariosFiltrados);//Sobrescribe el array antiguo con el nuevo array sin ese usuario.
+  guardarJSONStorage(CLAVES_STORAGE.usuarios, usuariosFiltrados);
 
-  //Si borras al usuario que estaba logueado, también se cierra la sesión.
   const usuarioActivo = obtenerUsuarioActivo();
   if (usuarioActivo && usuarioActivo.email === emailNormalizado) {
     cerrarSesion();
@@ -605,7 +574,7 @@ export async function crearPublicacion(datosPublicacion) {
   if (descripcion.length < 10) {
     throw new Error("La descripción debe tener al menos 10 caracteres.");
   }
-  //No pone id porque lo genera IndexedDB con autoIncrement.
+
   const nuevaPublicacion = {
     tipo,
     titulo,
@@ -617,14 +586,8 @@ export async function crearPublicacion(datosPublicacion) {
     fecha
   };
 
-  /*
-    add() devuelve el id generado automáticamente por IndexedDB.
-    Luego devolvemos el objeto completo con ese id añadido.
-  */
   const nuevoId = await agregarEnStore(STORE_PUBLICACIONES, nuevaPublicacion);
-  return { ...nuevaPublicacion, id: nuevoId };//...nuevaPublicacion copia todas las propiedades del objeto nuevaPublicacion 
-  // y luego id:nuevoId añade esa propiedad id al nuevo objeto que se devuelve. 
-  // Así el objeto resultante tiene todas las propiedades de nuevaPublicacion más la propiedad id con el valor generado por IndexedDB.
+  return { ...nuevaPublicacion, id: nuevoId };
 }
 
 /*
@@ -634,10 +597,8 @@ export async function crearPublicacion(datosPublicacion) {
   por si estaba arrastrada/seleccionada en el dashboard.
 */
 export async function eliminarPublicacion(idPublicacion) {
-  //Muy importante porque en frontend muchas veces los ids vienen como string
   const id = Number(idPublicacion);
 
-  //Valida que el id sea un entero válido.
   if (!Number.isInteger(id)) {
     throw new Error("El identificador de la publicación no es válido.");
   }
@@ -655,7 +616,7 @@ export async function eliminarPublicacion(idPublicacion) {
 
 /*
   Devuelve solo los ids de las publicaciones seleccionadas
-  en el dashboard.Lee todas las selecciones del dashboard y devuelve solo sus ids.
+  en el dashboard.
 */
 export async function listarIdsSeleccionados() {
   const registros = await obtenerTodosDeStore(STORE_SELECCIONADAS);
@@ -670,20 +631,8 @@ export async function listarIdsSeleccionados() {
   - publicacionId
   - fechaSeleccion
 
-  Así sabemos qué publicación fue seleccionada y cuándo.
-
-  ¿Por qué guardarEnStore y no agregarEnStore?
-
-  Porque STORE_SELECCIONADAS usa:
-
-  keyPath: "publicacionId"
-
-  Entonces put viene bien para:
-
-  insertar si no estaba
-  actualizar si ya estaba
-
-  Así no da problemas si el usuario intenta volver a soltar la misma publicación.
+  STORE_SELECCIONADAS usa keyPath: "publicacionId",
+  por eso usamos put para insertar o actualizar sin errores.
 */
 export async function anadirPublicacionSeleccionada(idPublicacion) {
   const id = Number(idPublicacion);
@@ -717,9 +666,6 @@ export async function quitarPublicacionSeleccionada(idPublicacion) {
   1. lee todas las publicaciones
   2. lee los ids seleccionados
   3. filtra las publicaciones cuyo id esté en la lista de seleccionados
-  cuando una tarjeta vuelva al área de disponibles o cuando se quite de la selección.
-
-  Conecta directamente con drag & drop.
 */
 export async function listarPublicacionesSeleccionadas() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
@@ -744,18 +690,17 @@ export async function listarPublicacionesDisponibles() {
 
 /*
   Devuelve un objeto con los números resumen del dashboard:
-
-    cuántas ofertas hay
-    cuántas demandas hay
-    cuántos usuarios hay
-    cuántas publicaciones están seleccionadas
+  - cuántas ofertas hay
+  - cuántas demandas hay
+  - cuántos usuarios hay
+  - cuántas publicaciones están seleccionadas
 */
 export async function obtenerResumenDashboard() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
     listarPublicaciones(),
     listarIdsSeleccionados()
   ]);
-  //objeto resumen con los números que se muestran en el dashboard.
+
   return {
     totalOfertas: publicaciones.filter((publicacion) => publicacion.tipo === "oferta").length,
     totalDemandas: publicaciones.filter((publicacion) => publicacion.tipo === "demanda").length,
