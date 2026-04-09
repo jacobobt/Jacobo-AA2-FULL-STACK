@@ -1,6 +1,12 @@
 import { cerrarSesion, obtenerUsuarioActivo } from "./almacenaje.js";
 
 /*
+  Tiempo por defecto que estará visible una alerta.
+  Está expresado en milisegundos.
+*/
+const DURACION_ALERTA_POR_DEFECTO = 4000;
+
+/*
   Esta función devuelve un texto simple con el nombre del usuario activo.
 
   Si no hay ningún usuario logueado, devuelve "-no login-".
@@ -130,16 +136,35 @@ export function configurarBotonCerrarSesion() {
   - elemento: el contenedor donde se pondrá la alerta
   - texto: el mensaje que queremos enseñar
   - tipo: el tipo de alerta Bootstrap (success, danger, warning, secondary, etc.)
+  - duracion: tiempo en milisegundos antes de limpiar la alerta.
+    Si vale 0 o un valor negativo, la alerta no se borrará sola.
 
-  Si no se pasa tipo, por defecto usa "secondary".
+  Mejora funcional:
+  - las alertas se eliminan automáticamente tras un tiempo
+  - si ya había un temporizador anterior en ese mismo elemento,
+    se cancela para evitar comportamientos extraños
 */
-export function mostrarAlerta(elemento, texto, tipo = "secondary") {
+export function mostrarAlerta(
+  elemento,
+  texto,
+  tipo = "secondary",
+  duracion = DURACION_ALERTA_POR_DEFECTO
+) {
   /*
     Si no existe el elemento donde mostrar la alerta,
     no hacemos nada.
   */
   if (!elemento) {
     return;
+  }
+
+  /*
+    Si este mismo elemento ya tenía una alerta programada para borrarse,
+    cancelamos ese temporizador antes de crear uno nuevo.
+  */
+  if (elemento.__alertTimeoutId) {
+    window.clearTimeout(elemento.__alertTimeoutId);
+    elemento.__alertTimeoutId = null;
   }
 
   /*
@@ -151,12 +176,22 @@ export function mostrarAlerta(elemento, texto, tipo = "secondary") {
       ${texto}
     </div>
   `;
+
+  /*
+    Si la duración es mayor que 0, programamos la limpieza automática.
+  */
+  if (duracion > 0) {
+    elemento.__alertTimeoutId = window.setTimeout(() => {
+      limpiarAlerta(elemento);
+    }, duracion);
+  }
 }
 
 /*
   Esta función limpia la alerta de un elemento.
 
-  Lo que hace es vaciar su contenido HTML.
+  Lo que hace es vaciar su contenido HTML
+  y cancelar cualquier temporizador pendiente asociado a ese elemento.
 */
 export function limpiarAlerta(elemento) {
   /*
@@ -164,6 +199,14 @@ export function limpiarAlerta(elemento) {
   */
   if (!elemento) {
     return;
+  }
+
+  /*
+    Si había un temporizador pendiente, lo cancelamos.
+  */
+  if (elemento.__alertTimeoutId) {
+    window.clearTimeout(elemento.__alertTimeoutId);
+    elemento.__alertTimeoutId = null;
   }
 
   /*
