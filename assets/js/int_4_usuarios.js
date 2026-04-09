@@ -53,6 +53,25 @@ async function inicializarPaginaUsuarios() {
 }
 
 /*
+  Devuelve una versión oculta de la contraseña para mostrarla en la tabla.
+
+  No cambia la contraseña real almacenada.
+  Solo evita que se vea en texto plano en pantalla.
+
+  Ejemplo:
+  "1234" -> "••••"
+*/
+function ocultarPassword(password) {
+  const longitud = String(password || "").length;
+
+  if (longitud === 0) {
+    return "";
+  }
+
+  return "•".repeat(longitud);
+}
+
+/*
   Esta función pinta en la tabla todos los usuarios guardados.
 
   Hace esto:
@@ -97,19 +116,16 @@ function pintarTablaUsuarios() {
 
     /*
       Construimos el HTML de la fila.
-      Mostramos:
-      - id
-      - nombre completo
-      - email
-      - contraseña
-      - rol
-      - botón eliminar
+
+      Mejora funcional:
+      la contraseña ya no se muestra en texto plano,
+      sino en versión visualmente oculta.
     */
     fila.innerHTML = `
       <td>${usuario.id}</td>
       <td>${usuario.nombre} ${usuario.apellidos}</td>
       <td>${usuario.email}</td>
-      <td>${usuario.password}</td>
+      <td>${ocultarPassword(usuario.password)}</td>
       <td><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
       <td>
         <button class="btn btn-sm btn-danger" data-email="${usuario.email}">Eliminar</button>
