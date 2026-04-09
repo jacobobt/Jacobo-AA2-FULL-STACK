@@ -105,7 +105,8 @@ export function pintarUsuarioEnNavbar() {
   1. busca el botón en el HTML
   2. si existe, le añade un evento click
   3. al pulsarlo:
-     - cierra la sesión
+     - pide confirmación
+     - si el usuario acepta, cierra la sesión
      - redirige a login.html
 */
 export function configurarBotonCerrarSesion() {
@@ -120,10 +121,17 @@ export function configurarBotonCerrarSesion() {
 
   /*
     Cuando el usuario pulse el botón:
+    - confirmamos la acción
     - se borra el usuario activo de localStorage
     - se redirige a la página de login
   */
   botonCerrarSesion.addEventListener("click", () => {
+    const confirmarCierre = window.confirm("¿Seguro que quieres cerrar sesión?");
+
+    if (!confirmarCierre) {
+      return;
+    }
+
     cerrarSesion();
     window.location.href = "login.html";
   });
