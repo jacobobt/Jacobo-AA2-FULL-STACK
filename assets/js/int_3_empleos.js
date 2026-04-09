@@ -183,9 +183,12 @@ async function pintarTablaPublicaciones() {
     /*
       Cuando el usuario pulse ese botón, se llamará a la función
       que elimina la publicación por id.
+
+      Ahora también le pasamos el título para poder mostrar
+      una confirmación más clara al usuario.
     */
     botonEliminar.addEventListener("click", async () => {
-      await gestionarBorradoPublicacion(publicacion.id);
+      await gestionarBorradoPublicacion(publicacion.id, publicacion.titulo);
     });
 
     /*
@@ -249,8 +252,25 @@ async function gestionarAltaPublicacion(evento) {
 
 /*
   Esta función elimina una publicación por su id.
+
+  Mejora funcional aplicada:
+  antes de borrar, se pide confirmación al usuario para evitar
+  eliminaciones accidentales.
 */
-async function gestionarBorradoPublicacion(idPublicacion) {
+async function gestionarBorradoPublicacion(idPublicacion, tituloPublicacion) {
+  /*
+    Mostramos una confirmación nativa del navegador.
+    Si el usuario cancela, no se borra nada.
+  */
+  const confirmarBorrado = window.confirm(
+    `¿Seguro que quieres eliminar la publicación "${tituloPublicacion}"?`
+  );
+
+  if (!confirmarBorrado) {
+    mostrarAlerta(mensajePublicacion, "Eliminación cancelada por el usuario.", "secondary");
+    return;
+  }
+
   try {
     /*
       Eliminamos la publicación en IndexedDB.
@@ -266,7 +286,11 @@ async function gestionarBorradoPublicacion(idPublicacion) {
     /*
       Mostramos mensaje de éxito.
     */
-    mostrarAlerta(mensajePublicacion, "Publicación eliminada correctamente.", "success");
+    mostrarAlerta(
+      mensajePublicacion,
+      `Publicación "${tituloPublicacion}" eliminada correctamente.`,
+      "success"
+    );
   } catch (error) {
     /*
       Si algo falla, mostramos error.
