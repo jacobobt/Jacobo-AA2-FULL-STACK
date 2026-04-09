@@ -124,8 +124,13 @@ function pintarTablaUsuarios() {
     /*
       Cuando el usuario pulse ese botón,
       se ejecutará la función que borra ese usuario por su email.
+
+      También pasamos el nombre completo para que el mensaje
+      de confirmación sea más claro.
     */
-    botonEliminar.addEventListener("click", () => gestionarBorradoUsuario(usuario.email));
+    botonEliminar.addEventListener("click", () =>
+      gestionarBorradoUsuario(usuario.email, `${usuario.nombre} ${usuario.apellidos}`)
+    );
 
     /*
       Finalmente añadimos la fila al cuerpo de la tabla.
@@ -203,20 +208,33 @@ function gestionarAltaUsuario(evento) {
 /*
   Esta función elimina un usuario usando su email.
 
-  Hace esto:
-  1. llama a eliminarUsuario(email)
-  2. repinta la tabla
-  3. repinta la navbar
-  4. muestra mensaje de éxito
-
-  Si algo falla, muestra mensaje de error.
+  Mejora funcional aplicada:
+  antes de borrar, se pide confirmación para evitar
+  eliminaciones accidentales.
 */
-function gestionarBorradoUsuario(email) {
+function gestionarBorradoUsuario(email, nombreCompleto) {
+  /*
+    Mostramos una confirmación nativa del navegador.
+    Si el usuario cancela, no se elimina nada.
+  */
+  const confirmarBorrado = window.confirm(
+    `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?`
+  );
+
+  if (!confirmarBorrado) {
+    mostrarAlerta(mensajeUsuario, "Eliminación cancelada por el usuario.", "secondary");
+    return;
+  }
+
   try {
     eliminarUsuario(email);
     pintarTablaUsuarios();
     pintarUsuarioEnNavbar();
-    mostrarAlerta(mensajeUsuario, "Usuario eliminado correctamente.", "success");
+    mostrarAlerta(
+      mensajeUsuario,
+      `Usuario "${nombreCompleto}" eliminado correctamente.`,
+      "success"
+    );
   } catch (error) {
     mostrarAlerta(mensajeUsuario, error.message, "danger");
   }
