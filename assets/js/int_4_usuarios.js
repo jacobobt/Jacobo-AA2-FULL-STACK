@@ -2,7 +2,8 @@ import {
   crearUsuario,
   eliminarUsuario,
   inicializarAlmacenamiento,
-  listarUsuarios
+  listarUsuarios,
+  obtenerUsuarioActivo
 } from "./almacenaje.js";
 import {
   capitalizarTexto,
@@ -224,18 +225,25 @@ function gestionarAltaUsuario(evento) {
 /*
   Esta función elimina un usuario usando su email.
 
-  Mejora funcional aplicada:
-  antes de borrar, se pide confirmación para evitar
-  eliminaciones accidentales.
+  Mejoras funcionales aplicadas:
+  - antes de borrar, se pide confirmación
+  - si el usuario a eliminar es el que tiene la sesión activa,
+    se avisa de que la sesión se cerrará automáticamente
 */
 function gestionarBorradoUsuario(email, nombreCompleto) {
+  const usuarioActivo = obtenerUsuarioActivo();
+  const esUsuarioActivo = usuarioActivo && usuarioActivo.email === email;
+
   /*
-    Mostramos una confirmación nativa del navegador.
-    Si el usuario cancela, no se elimina nada.
+    Construimos un mensaje distinto según el caso:
+    - borrado normal
+    - borrado del usuario que tiene la sesión activa
   */
-  const confirmarBorrado = window.confirm(
-    `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?`
-  );
+  const mensajeConfirmacion = esUsuarioActivo
+    ? `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?\n\nEste es el usuario que tiene la sesión activa ahora mismo, así que al borrarlo también se cerrará la sesión.`
+    : `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?`;
+
+  const confirmarBorrado = window.confirm(mensajeConfirmacion);
 
   if (!confirmarBorrado) {
     mostrarAlerta(mensajeUsuario, "Eliminación cancelada por el usuario.", "secondary");
@@ -246,11 +254,16 @@ function gestionarBorradoUsuario(email, nombreCompleto) {
     eliminarUsuario(email);
     pintarTablaUsuarios();
     pintarUsuarioEnNavbar();
-    mostrarAlerta(
-      mensajeUsuario,
-      `Usuario "${nombreCompleto}" eliminado correctamente.`,
-      "success"
-    );
+
+    /*
+      También diferenciamos el mensaje final según si el usuario borrado
+      era el que estaba logueado.
+    */
+    const mensajeExito = esUsuarioActivo
+      ? `Usuario "${nombreCompleto}" eliminado correctamente. La sesión activa se ha cerrado.`
+      : `Usuario "${nombreCompleto}" eliminado correctamente.`;
+
+    mostrarAlerta(mensajeUsuario, mensajeExito, "success");
   } catch (error) {
     mostrarAlerta(mensajeUsuario, error.message, "danger");
   }
