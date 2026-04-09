@@ -184,8 +184,7 @@ async function pintarTablaPublicaciones() {
       Cuando el usuario pulse ese botón, se llamará a la función
       que elimina la publicación por id.
 
-      Ahora también le pasamos el título para poder mostrar
-      una confirmación más clara al usuario.
+      También pasamos el título para mostrar una confirmación más clara.
     */
     botonEliminar.addEventListener("click", async () => {
       await gestionarBorradoPublicacion(publicacion.id, publicacion.titulo);
@@ -253,15 +252,11 @@ async function gestionarAltaPublicacion(evento) {
 /*
   Esta función elimina una publicación por su id.
 
-  Mejora funcional aplicada:
-  antes de borrar, se pide confirmación al usuario para evitar
-  eliminaciones accidentales.
+  Mejora funcional:
+  antes de borrar, pedimos confirmación al usuario
+  para evitar eliminaciones accidentales.
 */
 async function gestionarBorradoPublicacion(idPublicacion, tituloPublicacion) {
-  /*
-    Mostramos una confirmación nativa del navegador.
-    Si el usuario cancela, no se borra nada.
-  */
   const confirmarBorrado = window.confirm(
     `¿Seguro que quieres eliminar la publicación "${tituloPublicacion}"?`
   );
