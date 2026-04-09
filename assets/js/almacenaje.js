@@ -1,9 +1,12 @@
 import { usuariosIniciales, publicacionesIniciales } from "./datos.js";
 
 /*
-  Aquí guardamos los nombres de las claves que usaremos en localStorage.
-  Lo hacemos en un objeto para no escribir los textos "a mano" cada vez
-  y evitar errores de escritura.
+  Claves usadas en localStorage.
+
+  - usuarios: guarda el array de usuarios registrado en la aplicación.
+  - usuarioActivo: guarda el email del usuario logueado actualmente.
+  - publicacionesInicializadas: marca interna para no volver a sembrar
+    las publicaciones iniciales una vez cargadas por primera vez.
 */
 const CLAVES_STORAGE = {
   usuarios: "jobconnect_usuarios",
@@ -12,12 +15,13 @@ const CLAVES_STORAGE = {
 };
 
 /*
-  Constantes de IndexedDB.
-  - DB_NAME: nombre de la base de datos del navegador.
-  - DB_VERSION: versión de la base de datos.
-  - STORE_PUBLICACIONES: "tabla" donde guardamos ofertas y demandas.
-  - STORE_SELECCIONADAS: "tabla" donde guardamos qué publicaciones
-    han sido seleccionadas en el dashboard.
+  Configuración de IndexedDB.
+
+  - DB_NAME: nombre de la base de datos local del navegador.
+  - DB_VERSION: versión actual de la base de datos.
+  - STORE_PUBLICACIONES: almacén donde guardamos ofertas y demandas.
+  - STORE_SELECCIONADAS: almacén donde guardamos las publicaciones
+    seleccionadas en el dashboard.
 */
 const DB_NAME = "jobconnect_producto2_db";
 const DB_VERSION = 1;
@@ -25,62 +29,46 @@ const STORE_PUBLICACIONES = "publicaciones";
 const STORE_SELECCIONADAS = "seleccionadas";
 
 /*
-  Esta función crea una copia profunda de un dato.
-  ¿Por qué?
-  Porque si devolvemos directamente el objeto o array original,
-  podríamos modificarlo sin querer desde fuera.
-
-  Usamos JSON para "copiar y pegar" el contenido.
-  Sirve bien para datos simples como arrays y objetos normales.
+  Crea una copia profunda de un dato simple.
+  Se usa para evitar modificar por referencia arrays u objetos
+  que queremos devolver como copia independiente.
 */
 function clonarDato(dato) {
   return JSON.parse(JSON.stringify(dato));
 }
 
 /*
-  Lee un valor de localStorage y lo convierte de texto JSON a objeto/array real.
+  Lee un valor de localStorage y lo convierte desde JSON.
 
   Parámetros:
-  - clave: nombre bajo el que está guardado el dato
-  - valorPorDefecto: lo que devolveremos si no existe nada o hay error
-
-  localStorage solo guarda texto.
-  Por eso, cuando guardamos arrays u objetos, primero los convertimos a JSON.
-  Y cuando los leemos, hay que hacer JSON.parse.
+  - clave: nombre del valor guardado.
+  - valorPorDefecto: valor que se devolverá si no existe nada
+    o si el JSON da error al parsearse.
 */
 function leerJSONStorage(clave, valorPorDefecto) {
   const texto = localStorage.getItem(clave);
 
-  // Si no hay nada guardado con esa clave, devolvemos el valor por defecto.
   if (!texto) {
     return clonarDato(valorPorDefecto);
   }
 
   try {
-    // Intentamos convertir el texto JSON en array u objeto real.
     return JSON.parse(texto);
   } catch (error) {
-    // Si el JSON está roto o da error, devolvemos copia del valor por defecto.
     return clonarDato(valorPorDefecto);
   }
 }
 
 /*
-  Guarda un valor en localStorage en formato JSON.
-  Recuerda: localStorage no guarda objetos ni arrays directamente,
-  solo texto.
+  Guarda cualquier dato en localStorage en formato JSON.
 */
 function guardarJSONStorage(clave, valor) {
   localStorage.setItem(clave, JSON.stringify(valor));
 }
 
 /*
-  Convierte cualquier valor a texto y elimina espacios al inicio y al final.
-
-  Ejemplos:
-  "  hola  " -> "hola"
-  null -> ""
-  undefined -> ""
+  Convierte cualquier valor en texto y elimina espacios
+  al principio y al final.
 */
 function normalizarTexto(texto) {
   return String(texto || "").trim();
@@ -89,41 +77,69 @@ function normalizarTexto(texto) {
 /*
   Normaliza un email:
   - lo convierte a texto
-  - quita espacios sobrantes
+  - elimina espacios sobrantes
   - lo pasa a minúsculas
-
-  Así evitamos problemas como:
-  "JACOBO@MAIL.COM" y "jacobo@mail.com"
-  que en esencia deberían considerarse el mismo correo.
 */
 function normalizarEmail(email) {
   return normalizarTexto(email).toLowerCase();
 }
 
 /*
+  Comprueba si un email tiene un formato razonable.
+
+  No pretende ser una validación RFC perfecta,
+  pero sí bastante mejor que simplemente comprobar si contiene "@".
+*/
+function esEmailValido(email) {
+  const emailNormalizado = normalizarEmail(email);
+  const patron = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return patron.test(emailNormalizado);
+}
+
+/*
+  Comprueba si una fecha tiene formato YYYY-MM-DD
+  y si además representa una fecha válida.
+*/
+function esFechaValidaISO(fecha) {
+  const fechaNormalizada = normalizarTexto(fecha);
+
+  /*
+    Primero validamos el formato exacto.
+  */
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaNormalizada)) {
+    return false;
+  }
+
+  /*
+    Después comprobamos que el navegador pueda interpretarla
+    como una fecha real.
+  */
+  const tiempo = new Date(`${fechaNormalizada}T00:00:00`).getTime();
+  return !Number.isNaN(tiempo);
+}
+
+/*
   Abre la base de datos IndexedDB.
 
-  Esta función devuelve una Promise porque abrir IndexedDB es asíncrono:
-  tarda un pequeño tiempo y no devuelve el resultado al instante.
-
-  resolve(...) -> todo fue bien
-  reject(...)  -> hubo un error
+  Devuelve una Promise porque abrir IndexedDB es un proceso asíncrono.
+  Aquí también se crean los stores la primera vez o cuando haya
+  cambio de versión.
 */
 function abrirBaseDeDatos() {
   return new Promise((resolve, reject) => {
     const peticion = indexedDB.open(DB_NAME, DB_VERSION);
 
     /*
-      onupgradeneeded se ejecuta:
-      - la primera vez que se crea la base de datos
-      - o cuando cambiamos la versión (DB_VERSION)
-
-      Aquí es donde se crean los object stores (como tablas).
+      onupgradeneeded se ejecuta cuando la BD no existe aún
+      o cuando cambia la versión.
     */
     peticion.onupgradeneeded = (evento) => {
       const db = evento.target.result;
 
-      // Si no existe el store de publicaciones, lo creamos.
+      /*
+        Creamos el store de publicaciones si no existe.
+        El campo "id" será la clave primaria y se autogenerará.
+      */
       if (!db.objectStoreNames.contains(STORE_PUBLICACIONES)) {
         const storePublicaciones = db.createObjectStore(STORE_PUBLICACIONES, {
           keyPath: "id",
@@ -131,8 +147,9 @@ function abrirBaseDeDatos() {
         });
 
         /*
-          Creamos índices para poder buscar/organizar mejor los datos.
-          No son obligatorios para que funcione, pero ayudan a estructurar.
+          Índices auxiliares para organizar mejor los datos.
+          No son obligatorios, pero son útiles para estructurar
+          el almacenamiento.
         */
         storePublicaciones.createIndex("tipo", "tipo", { unique: false });
         storePublicaciones.createIndex("fecha", "fecha", { unique: false });
@@ -141,7 +158,10 @@ function abrirBaseDeDatos() {
         });
       }
 
-      // Si no existe el store de seleccionadas, lo creamos.
+      /*
+        Creamos el store de seleccionadas si no existe.
+        Aquí usamos como clave primaria el id de la publicación.
+      */
       if (!db.objectStoreNames.contains(STORE_SELECCIONADAS)) {
         db.createObjectStore(STORE_SELECCIONADAS, {
           keyPath: "publicacionId"
@@ -149,12 +169,16 @@ function abrirBaseDeDatos() {
       }
     };
 
-    // Si la base de datos se abre bien, devolvemos la base.
+    /*
+      Si la apertura va bien, resolvemos la promesa con la BD abierta.
+    */
     peticion.onsuccess = () => {
       resolve(peticion.result);
     };
 
-    // Si falla, lanzamos error.
+    /*
+      Si falla la apertura, rechazamos la promesa con un error claro.
+    */
     peticion.onerror = () => {
       reject(new Error("No se pudo abrir la base de datos del navegador."));
     };
@@ -162,12 +186,7 @@ function abrirBaseDeDatos() {
 }
 
 /*
-  Lee TODOS los registros de un object store de IndexedDB.
-  “Ve a ese almacén y tráeme todo lo que haya dentro.”
-
-  Ejemplo:
-  - obtenerTodosDeStore("publicaciones")
-  - obtenerTodosDeStore("seleccionadas")
+  Devuelve todos los registros de un store concreto.
 */
 function obtenerTodosDeStore(nombreStore) {
   return new Promise(async (resolve, reject) => {
@@ -186,11 +205,7 @@ function obtenerTodosDeStore(nombreStore) {
 }
 
 /*
-  Lee UN solo registro de un object store usando su clave primaria.
-
-  Ejemplo:
-  - obtenerUnoDeStore("publicaciones", 3)
-    -> devuelve la publicación con id 3
+  Devuelve un único registro de un store usando su clave primaria.
 */
 function obtenerUnoDeStore(nombreStore, clave) {
   return new Promise(async (resolve, reject) => {
@@ -200,6 +215,9 @@ function obtenerUnoDeStore(nombreStore, clave) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.get(clave);
 
+      /*
+        Si no existe ningún registro con esa clave, devolvemos null.
+      */
       peticion.onsuccess = () => resolve(peticion.result || null);
       peticion.onerror = () => reject(new Error(`No se pudo leer el registro de ${nombreStore}.`));
     } catch (error) {
@@ -209,11 +227,7 @@ function obtenerUnoDeStore(nombreStore, clave) {
 }
 
 /*
-  Cuenta cuántos registros hay en un store.
-
-  Ejemplo:
-  - contarStore("publicaciones")
-    -> devuelve cuántas publicaciones hay guardadas
+  Cuenta cuántos registros hay dentro de un store.
 */
 function contarStore(nombreStore) {
   return new Promise(async (resolve, reject) => {
@@ -234,9 +248,8 @@ function contarStore(nombreStore) {
 /*
   Añade un nuevo registro al store.
 
-  IMPORTANTE:
-  - add() se usa para insertar uno nuevo
-  - si ya existe esa clave, puede fallar
+  Se usa add() porque queremos insertar uno nuevo.
+  Si ya existiera esa clave, podría fallar.
 */
 function agregarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
@@ -246,6 +259,10 @@ function agregarEnStore(nombreStore, dato) {
       const store = transaccion.objectStore(nombreStore);
       const peticion = store.add(dato);
 
+      /*
+        En stores con clave autoincremental, peticion.result suele devolver
+        el id generado automáticamente.
+      */
       peticion.onsuccess = () => resolve(peticion.result);
       peticion.onerror = () => reject(new Error(`No se pudo guardar en ${nombreStore}.`));
     } catch (error) {
@@ -255,17 +272,11 @@ function agregarEnStore(nombreStore, dato) {
 }
 
 /*
-  Guarda o actualiza un registro en el store.
+  Inserta o actualiza un registro en el store.
 
-  IMPORTANTE:
-  - put() inserta si no existe
-  - o actualiza si ya existe
-
-  Es muy útil cuando queremos "dejar guardado" algo sin preocuparnos
-  de si ya estaba antes o no.
-
-  add(...) → añadir nuevo
-  put(...) → guardar/actualizar
+  A diferencia de add(), put() permite:
+  - crear si no existe
+  - actualizar si ya existe
 */
 function guardarEnStore(nombreStore, dato) {
   return new Promise(async (resolve, reject) => {
@@ -284,11 +295,7 @@ function guardarEnStore(nombreStore, dato) {
 }
 
 /*
-  Elimina un registro del store por su clave.
-  Se usa para:
-  - borrar publicaciones
-  - borrar seleccionadas
-  - quitar una publicación del área seleccionada del dashboard
+  Elimina un registro del store usando su clave primaria.
 */
 function eliminarDeStore(nombreStore, clave) {
   return new Promise(async (resolve, reject) => {
@@ -307,14 +314,11 @@ function eliminarDeStore(nombreStore, clave) {
 }
 
 /*
-  Función principal de arranque del almacenamiento.
+  Inicializa el almacenamiento de la aplicación.
 
-  Se encarga de:
-  1. asegurarse de que existan usuarios iniciales en localStorage
-  2. asegurarse de que existan publicaciones iniciales en IndexedDB
-
-  En Producto 2, datos.js ya no es la fuente principal.
-  Solo actúa como semilla inicial.
+  Hace dos cosas:
+  1. Asegura que existan usuarios iniciales en localStorage.
+  2. Asegura la primera carga de publicaciones en IndexedDB.
 */
 export async function inicializarAlmacenamiento() {
   inicializarUsuariosSiNoExisten();
@@ -322,8 +326,7 @@ export async function inicializarAlmacenamiento() {
 }
 
 /*
-  Si todavía no hay usuarios guardados en localStorage,
-  guardamos los usuarios iniciales.
+  Si todavía no hay usuarios guardados, carga los usuarios iniciales.
 */
 function inicializarUsuariosSiNoExisten() {
   if (!localStorage.getItem(CLAVES_STORAGE.usuarios)) {
@@ -334,38 +337,46 @@ function inicializarUsuariosSiNoExisten() {
 /*
   Inserta las publicaciones iniciales solo una vez.
 
-  Antes, si el store quedaba vacío porque el usuario borraba todas las
-  publicaciones manualmente, al refrescar se volvían a insertar.
-  Ahora evitamos eso guardando una marca en localStorage.
+  CORRECCIÓN IMPORTANTE:
+  Antes, si el usuario borraba todas las publicaciones y recargaba,
+  se volvían a insertar automáticamente porque el store estaba vacío.
 
-  Así:
-  - la primera vez se cargan las publicaciones iniciales
-  - después ya no se vuelven a sembrar, aunque el store quede vacío
+  Ahora usamos una marca en localStorage para recordar si ya se hizo
+  la siembra inicial. Así:
+  - la primera vez sí se cargan
+  - después ya no reaparecen aunque el usuario las borre todas
 */
 async function inicializarPublicacionesSiNoExisten() {
   const yaInicializadas =
     localStorage.getItem(CLAVES_STORAGE.publicacionesInicializadas) === "true";
 
-  // Si ya se cargaron una vez, no volvemos a insertarlas.
+  /*
+    Si ya se inicializaron una vez, no hacemos nada más.
+  */
   if (yaInicializadas) {
     return;
   }
 
   const totalPublicaciones = await contarStore(STORE_PUBLICACIONES);
 
-  // Solo sembramos si de verdad no hay publicaciones guardadas.
+  /*
+    Solo insertamos las publicaciones semilla si realmente no hay ninguna.
+  */
   if (totalPublicaciones === 0) {
     for (const publicacion of publicacionesIniciales) {
       await agregarEnStore(STORE_PUBLICACIONES, publicacion);
     }
   }
 
-  // Marcamos que la siembra inicial ya se realizó.
+  /*
+    Marcamos la inicialización como hecha para no repetirla más adelante.
+  */
   localStorage.setItem(CLAVES_STORAGE.publicacionesInicializadas, "true");
 }
 
 /*
-  Devuelve la lista de usuarios ordenada alfabéticamente por nombre + apellidos.
+  Devuelve la lista de usuarios ordenada alfabéticamente
+  por nombre completo.
 */
 export function listarUsuarios() {
   const usuarios = leerJSONStorage(CLAVES_STORAGE.usuarios, []);
@@ -378,11 +389,11 @@ export function listarUsuarios() {
 }
 
 /*
-  Devuelve el usuario que está actualmente logueado.
+  Devuelve el usuario actualmente logueado.
 
-  ¿Cómo lo sabe?
-  1. Mira en localStorage qué email está guardado como usuario activo
-  2. Busca ese email dentro del array de usuarios
+  Para ello:
+  1. Lee el email guardado como usuario activo.
+  2. Busca ese email dentro del listado de usuarios.
 */
 export function obtenerUsuarioActivo() {
   const emailActivo = normalizarEmail(localStorage.getItem(CLAVES_STORAGE.usuarioActivo));
@@ -396,15 +407,14 @@ export function obtenerUsuarioActivo() {
 }
 
 /*
-  Guarda en localStorage el email del usuario activo.
-  Esto permite "recordar" el login entre páginas.
+  Guarda el email del usuario activo en localStorage.
 */
 export function guardarUsuarioActivo(email) {
   localStorage.setItem(CLAVES_STORAGE.usuarioActivo, normalizarEmail(email));
 }
 
 /*
-  Cierra sesión eliminando el usuario activo de localStorage.
+  Cierra la sesión borrando el usuario activo.
 */
 export function cerrarSesion() {
   localStorage.removeItem(CLAVES_STORAGE.usuarioActivo);
@@ -413,13 +423,12 @@ export function cerrarSesion() {
 /*
   Crea un nuevo usuario.
 
-  Pasos:
-  1. lee usuarios actuales
-  2. normaliza los datos
-  3. valida campos
-  4. comprueba duplicados
-  5. calcula un nuevo id
-  6. lo guarda en localStorage
+  Flujo:
+  1. Normaliza los datos.
+  2. Valida campos.
+  3. Comprueba duplicados.
+  4. Genera un id nuevo.
+  5. Guarda el usuario en localStorage.
 */
 export function crearUsuario(datosUsuario) {
   const usuarios = listarUsuarios();
@@ -428,18 +437,22 @@ export function crearUsuario(datosUsuario) {
   const apellidos = normalizarTexto(datosUsuario.apellidos);
   const email = normalizarEmail(datosUsuario.email);
   const password = normalizarTexto(datosUsuario.password);
-  const rol = normalizarTexto(datosUsuario.rol);
+  const rol = normalizarTexto(datosUsuario.rol).toLowerCase();
 
   if (!nombre || !apellidos || !email || !password || !rol) {
     throw new Error("Todos los campos del usuario son obligatorios.");
   }
 
-  if (!email.includes("@")) {
+  if (!esEmailValido(email)) {
     throw new Error("El correo electrónico no tiene un formato válido.");
   }
 
   if (password.length < 4) {
     throw new Error("La contraseña debe tener al menos 4 caracteres.");
+  }
+
+  if (rol !== "candidato" && rol !== "empresa") {
+    throw new Error("El rol del usuario debe ser candidato o empresa.");
   }
 
   const usuarioDuplicado = usuarios.some((usuario) => usuario.email === email);
@@ -468,10 +481,10 @@ export function crearUsuario(datosUsuario) {
 }
 
 /*
-  Elimina un usuario por email.
+  Elimina un usuario usando su email.
 
-  Además, si el usuario eliminado era el que estaba logueado,
-  se cierra la sesión automáticamente.
+  Si el usuario eliminado era el que estaba logueado,
+  también se cierra la sesión automáticamente.
 */
 export function eliminarUsuario(email) {
   const emailNormalizado = normalizarEmail(email);
@@ -496,7 +509,9 @@ export function eliminarUsuario(email) {
 /*
   Intenta iniciar sesión con email y contraseña.
 
-  Si encuentra un usuario que coincida, guarda su email como usuario activo.
+  Si encuentra coincidencia:
+  - guarda el usuario activo
+  - devuelve el usuario encontrado
 */
 export function loguearUsuario(email, password) {
   const emailNormalizado = normalizarEmail(email);
@@ -522,8 +537,8 @@ export function loguearUsuario(email, password) {
 
 /*
   Devuelve todas las publicaciones ordenadas:
-  1. primero por fecha más reciente
-  2. si empatan en fecha, por id descendente
+  1. por fecha más reciente
+  2. en caso de empate, por id descendente
 */
 export async function listarPublicaciones() {
   const publicaciones = await obtenerTodosDeStore(STORE_PUBLICACIONES);
@@ -542,12 +557,6 @@ export async function listarPublicaciones() {
 
 /*
   Crea una nueva publicación en IndexedDB.
-
-  Pasos:
-  1. normaliza datos
-  2. valida
-  3. construye el objeto
-  4. lo guarda en STORE_PUBLICACIONES
 */
 export async function crearPublicacion(datosPublicacion) {
   const tipo = normalizarTexto(datosPublicacion.tipo).toLowerCase();
@@ -567,8 +576,12 @@ export async function crearPublicacion(datosPublicacion) {
     throw new Error("El tipo de publicación debe ser oferta o demanda.");
   }
 
-  if (!emailContacto.includes("@")) {
+  if (!esEmailValido(emailContacto)) {
     throw new Error("El email de contacto no es válido.");
+  }
+
+  if (!esFechaValidaISO(fecha)) {
+    throw new Error("La fecha de la publicación no es válida.");
   }
 
   if (descripcion.length < 10) {
@@ -591,10 +604,10 @@ export async function crearPublicacion(datosPublicacion) {
 }
 
 /*
-  Elimina una publicación por id.
+  Elimina una publicación por su id.
 
-  Además, también la elimina de STORE_SELECCIONADAS
-  por si estaba arrastrada/seleccionada en el dashboard.
+  Además, si esa publicación estaba seleccionada en el dashboard,
+  también se elimina del store de seleccionadas.
 */
 export async function eliminarPublicacion(idPublicacion) {
   const id = Number(idPublicacion);
@@ -615,8 +628,7 @@ export async function eliminarPublicacion(idPublicacion) {
 }
 
 /*
-  Devuelve solo los ids de las publicaciones seleccionadas
-  en el dashboard.
+  Devuelve solo los ids de las publicaciones seleccionadas.
 */
 export async function listarIdsSeleccionados() {
   const registros = await obtenerTodosDeStore(STORE_SELECCIONADAS);
@@ -624,15 +636,11 @@ export async function listarIdsSeleccionados() {
 }
 
 /*
-  Añade una publicación a la lista de seleccionadas.
+  Añade una publicación a la selección del dashboard.
 
-  Aquí no guardamos la publicación completa,
-  sino un registro con:
-  - publicacionId
-  - fechaSeleccion
-
-  STORE_SELECCIONADAS usa keyPath: "publicacionId",
-  por eso usamos put para insertar o actualizar sin errores.
+  Guardamos:
+  - el id de la publicación
+  - la fecha de selección
 */
 export async function anadirPublicacionSeleccionada(idPublicacion) {
   const id = Number(idPublicacion);
@@ -651,7 +659,7 @@ export async function anadirPublicacionSeleccionada(idPublicacion) {
 }
 
 /*
-  Quita una publicación de la lista de seleccionadas.
+  Quita una publicación de la selección del dashboard.
 */
 export async function quitarPublicacionSeleccionada(idPublicacion) {
   const id = Number(idPublicacion);
@@ -660,12 +668,7 @@ export async function quitarPublicacionSeleccionada(idPublicacion) {
 }
 
 /*
-  Devuelve solo las publicaciones que están seleccionadas.
-
-  ¿Cómo?
-  1. lee todas las publicaciones
-  2. lee los ids seleccionados
-  3. filtra las publicaciones cuyo id esté en la lista de seleccionados
+  Devuelve las publicaciones que están seleccionadas.
 */
 export async function listarPublicacionesSeleccionadas() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
@@ -677,7 +680,7 @@ export async function listarPublicacionesSeleccionadas() {
 }
 
 /*
-  Devuelve solo las publicaciones que NO están seleccionadas.
+  Devuelve las publicaciones que todavía NO están seleccionadas.
 */
 export async function listarPublicacionesDisponibles() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
@@ -689,11 +692,7 @@ export async function listarPublicacionesDisponibles() {
 }
 
 /*
-  Devuelve un objeto con los números resumen del dashboard:
-  - cuántas ofertas hay
-  - cuántas demandas hay
-  - cuántos usuarios hay
-  - cuántas publicaciones están seleccionadas
+  Devuelve un resumen numérico para el dashboard.
 */
 export async function obtenerResumenDashboard() {
   const [publicaciones, idsSeleccionados] = await Promise.all([
