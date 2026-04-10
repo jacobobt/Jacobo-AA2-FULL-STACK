@@ -344,9 +344,91 @@ Durante el diseño de las interfaces se han seguido criterios de usabilidad como
 
 Estos criterios ayudan a que la aplicación sea más fácil de utilizar y más comprensible para cualquier usuario.
 
+## 10. Ajustes visuales finales de la interfaz
+
+Durante la fase final del Producto 2 se realizó una iteración ligera de mejora visual sobre varias pantallas de la aplicación, manteniendo la estructura funcional previamente definida en los mockups iniciales.
+
+El objetivo de esta revisión no fue rediseñar la interfaz, sino reforzar la consistencia visual del sistema y mejorar la claridad de presentación de los distintos bloques de información.
+
+Las mejoras aplicadas se centraron en:
+
+- refuerzo visual de la barra de navegación común
+- incorporación de encabezados de página con título principal y subtítulo descriptivo
+- mejora del acabado visual de formularios y bloques de contenido
+- mayor integración visual de tablas de listado
+- delimitación más clara del bloque gráfico en la pantalla de ofertas y demandas
+- mejora de la jerarquía visual de la pantalla de login
+
+Estos cambios no alteran la funcionalidad ni la arquitectura del sistema, sino que representan una iteración final orientada a mejorar la experiencia visual y la coherencia entre pantallas.
+
 ---
 
-## 10. Conclusión
+## 11 Evolución de la interfaz: versión final
+
+Los mockups presentados anteriormente definieron la estructura base de la aplicación, incluyendo la distribución de elementos, navegación y funcionalidades principales.
+
+Durante la fase final de implementación se ha realizado una iteración visual ligera sobre dichas interfaces, con el objetivo de mejorar la claridad, la consistencia y la presentación general del sistema, sin modificar la arquitectura funcional previamente definida.
+
+A continuación se muestra la evolución de algunas de las pantallas principales.
+
+### Dashboard principal
+
+**Mockup inicial:**
+![Mockup Dashboard](mockups/mockup-dashboard.png)
+
+**Versión final implementada:**
+![Dashboard final](mockups/final-dashboard.png)
+
+**Ajustes realizados:**
+- mejora de la barra de navegación para reforzar la identidad visual
+- mayor separación y claridad en los bloques de contenido
+- refinamiento visual de tarjetas informativas
+
+
+### Pantalla de login
+
+**Mockup inicial:**
+![Mockup Login](mockups/mockup-login.png)
+
+**Versión final implementada:**
+![Login final](mockups/final-login.png)
+
+**Ajustes realizados:**
+- incorporación de encabezado con título y subtítulo
+- mejora de la presentación del formulario de acceso
+- mayor diferenciación del bloque de estado de sesión
+
+
+### Gestión de usuarios
+
+**Mockup inicial:**
+![Mockup Usuarios](mockups/mockup-usuarios.png)
+
+**Versión final implementada:**
+![Usuarios final](mockups/final-usuarios.png)
+
+**Ajustes realizados:**
+- mejora de la jerarquía visual mediante encabezado de pantalla
+- mayor integración del formulario dentro del layout
+- mejora visual del contenedor de la tabla de usuarios
+
+
+### Gestión de ofertas y demandas
+
+**Mockup inicial:**
+![Mockup Ofertas](mockups/mockup-ofertas-demandas.png)
+
+**Versión final implementada:**
+![Ofertas final](mockups/final-ofertas-demandas.png)
+
+**Ajustes realizados:**
+- mejora visual del bloque de formulario
+- delimitación del gráfico Canvas mediante contenedor visual
+- mayor coherencia estética con el resto de pantallas
+
+---
+
+## 12. Conclusión
 Las interfaces del **Producto 2** de JobConnect muestran una evolución clara respecto al Producto 1.
 
 Ahora no solo existe una organización visual coherente, sino también una interacción más rica gracias a la persistencia local, el uso de `Canvas` y la selección de publicaciones mediante `Drag & Drop`.

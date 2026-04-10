@@ -309,7 +309,24 @@ Estas limitaciones son coherentes con el alcance del producto y forman parte de 
 
 ---
 
-## 5. Conclusión
+
+## 5. Mejora visual final de interfaces
+
+Una vez completada la implementación funcional del sistema, se realizó una pequeña iteración visual sobre determinadas pantallas de la aplicación con el objetivo de mejorar la consistencia entre interfaces y reforzar la claridad de uso.
+
+Esta mejora final se aplicó sin modificar la lógica de negocio ni los mecanismos de persistencia ya implementados. Los cambios se centraron en aspectos de presentación, tales como:
+
+- mejora de la navegación superior compartida
+- mejor jerarquía visual en títulos y subtítulos de pantalla
+- presentación más uniforme de formularios y listados
+- mejora visual del contenedor del gráfico Canvas
+- mayor limpieza y cohesión en la pantalla de autenticación
+
+Con ello se buscó consolidar una interfaz más clara, homogénea y cercana al aspecto final de una aplicación real, manteniendo intacta la base técnica del producto.
+
+---
+
+## 6. Conclusión
 La arquitectura aplicada en el **Producto 2** de JobConnect mejora de forma clara la base construida en el Producto 1.
 
 La incorporación de `localStorage`, `IndexedDB`, `Canvas` y `Drag & Drop`, junto con una estructura modular en JavaScript, permite disponer de una aplicación frontend más completa, persistente y preparada para crecer.

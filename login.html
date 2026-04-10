@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <!-- Configuración básica del documento -->
   <meta charset="UTF-8" />
@@ -9,16 +10,13 @@
   <title>JobConnect | Login</title>
 
   <!-- Bootstrap 5 para diseño responsive y componentes visuales -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-    crossorigin="anonymous"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
 
   <!-- Estilos propios del proyecto -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
+
 <body>
   <!-- =========================
        BARRA DE NAVEGACIÓN
@@ -34,15 +32,8 @@
       <a class="navbar-brand" href="index.html">JobConnect</a>
 
       <!-- Botón hamburguesa para navegación en móvil -->
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarLogin"
-        aria-controls="navbarLogin"
-        aria-expanded="false"
-        aria-label="Mostrar navegación"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLogin"
+        aria-controls="navbarLogin" aria-expanded="false" aria-label="Mostrar navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -78,83 +69,60 @@
        - derecha: estado actual de la sesión
   -->
   <main class="container py-4">
-    <div class="row justify-content-center g-4">
-      <!-- =========================
-           COLUMNA IZQUIERDA
-           FORMULARIO DE LOGIN
-           ========================= -->
+
+    <!-- Encabezado -->
+    <section class="mb-4 text-center">
+      <h1 class="h3 page-heading mb-1">Acceso a la aplicación</h1>
+      <p class="page-subtitle mb-0">
+        Inicio de sesión y consulta del estado actual de la sesión.
+      </p>
+    </section>
+
+    <div class="row g-4">
+
+      <!-- Columna Login -->
       <div class="col-12 col-lg-7">
-        <div class="seccion-formulario h-100">
-          <h1 class="h3 mb-3 text-center">Iniciar sesión</h1>
+        <div class="seccion-formulario h-100 login-panel">
 
-          <!-- Texto explicativo del comportamiento de esta pantalla -->
-          <p class="text-muted text-center">
-            Esta pantalla valida usuarios guardados en WebStorage y mantiene el usuario activo en localStorage.
-          </p>
+          <h2 class="h4 mb-3 text-center">Iniciar sesión</h2>
 
-          <!--
-            Formulario principal de login.
-
-            JavaScript capturará el submit de este formulario para:
-            - leer email y contraseña
-            - validarlos
-            - comprobar si existen en localStorage
-            - guardar el usuario activo si el login es correcto
-          -->
-          <form id="form-login" novalidate>
-            <!-- Campo email -->
-            <div class="mb-3">
-              <label for="email-login" class="form-label">Correo electrónico</label>
-              <input
-                type="email"
-                class="form-control"
-                id="email-login"
-                placeholder="ejemplo@correo.com"
-                required
-              />
+          <form id="login-form" class="row g-3" novalidate>
+            <div class="col-12">
+              <label for="login-usuario" class="form-label">Usuario</label>
+              <input id="login-usuario" class="form-control" type="text" required>
             </div>
 
-            <!-- Campo contraseña -->
-            <div class="mb-3">
-              <label for="password-login" class="form-label">Contraseña</label>
-              <input
-                type="password"
-                class="form-control"
-                id="password-login"
-                placeholder="********"
-                required
-              />
+            <div class="col-12">
+              <label for="login-password" class="form-label">Contraseña</label>
+              <input id="login-password" class="form-control" type="password" required>
             </div>
 
-            <!-- Botón de envío -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+            <div class="col-12 d-flex gap-2">
+              <button class="btn btn-primary" type="submit">Entrar</button>
+              <button class="btn btn-outline-secondary" type="button" id="btn-logout">
+                Cerrar sesión
+              </button>
             </div>
           </form>
 
-          <!-- Zona donde JS mostrará mensajes de éxito o error -->
-          <div id="mensaje-login" class="mt-3"></div>
         </div>
       </div>
 
-      <!-- =========================
-           COLUMNA DERECHA
-           ESTADO DE LA SESIÓN
-           =========================
-           Aquí JavaScript mostrará si hay un usuario activo
-           y qué usuario está actualmente logueado.
-      -->
+      <!-- Columna estado sesión -->
       <div class="col-12 col-lg-5">
-        <div class="section-card h-100">
+        <div class="section-card h-100 session-panel">
+
           <h2 class="h5 mb-3">Estado de la sesión</h2>
 
-          <!-- Este texto se reemplaza al cargar la página -->
-          <p id="usuario-activo-pagina" class="mb-0 text-muted">
-            Comprobando el usuario activo...
+          <p id="usuario-activo-pagina" class="mb-0">
+            No hay sesión iniciada.
           </p>
+
         </div>
       </div>
+
     </div>
+
   </main>
 
   <!-- Pie de página -->
@@ -165,13 +133,13 @@
   </footer>
 
   <!-- Bootstrap JS para navbar responsive y otros componentes -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"
-  ></script>
+    crossorigin="anonymous"></script>
 
-  <!-- Módulo JavaScript que controla toda la lógica de esta pantalla -->
-  <script type="module" src="assets/js/int_2_login.js"></script>
+  <!-- Módulo principal de esta pantalla:
+       controla formulario, tabla y gráfico Canvas -->
+  <script type="module" src="assets/js/int_3_empleos.js"></script>
 </body>
+
 </html>
