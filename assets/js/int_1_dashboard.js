@@ -306,7 +306,11 @@ async function moverASeleccionadas(idPublicacion) {
 }
 
 /*
-  Devuelve una publicación al bloque de disponibles usando doble clic.
+  Devuelve una publicación al bloque de disponibles.
+
+  Esta función se reutiliza en dos acciones distintas:
+  - doble clic sobre una tarjeta seleccionada
+  - botón con X dentro de la propia tarjeta seleccionada
 */
 async function moverADisponibles(idPublicacion) {
   try {
@@ -436,6 +440,23 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
     const badgeClase = publicacion.tipo === "oferta" ? "badge-oferta" : "badge-demanda";
 
     /*
+      En las tarjetas seleccionadas añadimos un botón con X.
+
+      Este botón permite devolver la publicación al listado general
+      sin necesidad de arrastrarla ni hacer doble clic.
+    */
+    const botonQuitarSeleccion = origen === "seleccionadas"
+      ? `
+        <button
+          type="button"
+          class="btn-close btn-quitar-seleccion"
+          aria-label="Devolver publicación al listado general"
+          title="Devolver al listado general"
+        ></button>
+      `
+      : "";
+
+    /*
       Construimos el HTML de la tarjeta.
 
       draggable="true" es clave:
@@ -446,10 +467,13 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
     */
     columna.innerHTML = `
       <article class="card card-publicacion h-100 tarjeta-arrastrable" draggable="true" data-id="${publicacion.id}">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap">
-            <span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span>
-            <small class="text-muted">${publicacion.fecha}</small>
+        <div class="card-body position-relative">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap tarjeta-cabecera-publicacion">
+            <div class="d-flex align-items-start gap-2 flex-wrap pe-4">
+              <span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span>
+              <small class="text-muted">${publicacion.fecha}</small>
+            </div>
+            ${botonQuitarSeleccion}
           </div>
           <h3 class="h5">${publicacion.titulo}</h3>
           <p class="mb-2"><strong>Categoría:</strong> ${publicacion.categoria}</p>
@@ -465,6 +489,12 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
       Buscamos el article que actuará como tarjeta arrastrable.
     */
     const tarjeta = columna.querySelector(".tarjeta-arrastrable");
+
+    /*
+      Si la tarjeta pertenece a seleccionadas,
+      buscamos también el botón con X para configurar su click.
+    */
+    const botonCerrar = columna.querySelector(".btn-quitar-seleccion");
 
     /*
       dragstart ocurre cuando el usuario empieza a arrastrar la tarjeta.
@@ -507,6 +537,25 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
         await moverADisponibles(publicacion.id);
       }
     });
+
+    /*
+      Si existe el botón con X, añadimos su acción.
+
+      Detenemos la propagación para que al pulsar la X
+      no se lance también el doble clic de la tarjeta.
+    */
+    if (botonCerrar) {
+      botonCerrar.addEventListener("dblclick", (evento) => {
+        evento.preventDefault();
+        evento.stopPropagation();
+      });
+
+      botonCerrar.addEventListener("click", async (evento) => {
+        evento.preventDefault();
+        evento.stopPropagation();
+        await moverADisponibles(publicacion.id);
+      });
+    }
 
     /*
       Añadimos la tarjeta ya montada al contenedor.
