@@ -22,6 +22,7 @@ const emailPublicacion = document.getElementById("email-publicacion");
 const tablaPublicacionesBody = document.getElementById("tabla-publicaciones-body");
 const mensajePublicacion = document.getElementById("mensaje-publicacion");
 const canvasGrafico = document.getElementById("grafico-publicaciones");
+const estadoGrafico = document.getElementById("estado-grafico");
 
 /*
   Temporizador para evitar redibujar demasiadas veces seguidas el gráfico
@@ -90,7 +91,7 @@ async function pintarTablaPublicaciones() {
 
   if (publicaciones.length === 0) {
     tablaPublicacionesBody.innerHTML = `
-      <tr>
+      <tr class="fila-vacia">
         <td colspan="8" class="text-center text-muted">No hay ofertas o demandas registradas.</td>
       </tr>
     `;
@@ -108,15 +109,16 @@ async function pintarTablaPublicaciones() {
       <td><span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span></td>
       <td>${publicacion.titulo}</td>
       <td>${publicacion.fecha}</td>
-      <td>${publicacion.emailContacto}</td>
-      <td>${publicacion.descripcion}</td>
+      <td class="columna-email">${publicacion.emailContacto}</td>
+      <td class="columna-descripcion">${publicacion.descripcion}</td>
       <td>${publicacion.ubicacion}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" data-id="${publicacion.id}">Eliminar</button>
+      <td class="columna-accion">
+        <button class="btn btn-sm btn-action-delete" data-id="${publicacion.id}">Eliminar</button>
       </td>
     `;
 
     const botonEliminar = fila.querySelector("button");
+
     botonEliminar.addEventListener("click", async () => {
       await gestionarBorradoPublicacion(publicacion.id, publicacion.titulo);
     });
@@ -219,7 +221,26 @@ function dibujarRectanguloRedondeado(ctx, x, y, ancho, alto, radio) {
 }
 
 /*
-  Esta función dibuja un gráfico más completo y visualmente mejor resuelto.
+  Actualiza el chip superior del gráfico con un resumen rápido.
+*/
+function actualizarEstadoGrafico(totalOfertas, totalDemandas) {
+  if (!estadoGrafico) {
+    return;
+  }
+
+  const totalPublicaciones = totalOfertas + totalDemandas;
+
+  if (totalPublicaciones === 0) {
+    estadoGrafico.textContent = "Sin publicaciones registradas";
+    return;
+  }
+
+  estadoGrafico.textContent = `${totalOfertas} ofertas · ${totalDemandas} demandas · ${totalPublicaciones} en total`;
+}
+
+/*
+  Esta función dibuja un gráfico más completo, mejor distribuido
+  y visualmente más equilibrado.
 */
 async function pintarGraficoCanvas() {
   if (!canvasGrafico || !canvasGrafico.getContext) {
@@ -231,181 +252,121 @@ async function pintarGraficoCanvas() {
   const totalDemandas = publicaciones.filter((publicacion) => publicacion.tipo === "demanda").length;
   const totalPublicaciones = totalOfertas + totalDemandas;
 
+  actualizarEstadoGrafico(totalOfertas, totalDemandas);
+
   const { ctx, ancho, alto } = prepararCanvasHD(canvasGrafico);
+  const maximo = Math.max(totalOfertas, totalDemandas, 1);
 
   ctx.clearRect(0, 0, ancho, alto);
 
-  /*
-    Fondo general del gráfico con un degradado más tecnológico.
-  */
   const fondo = ctx.createLinearGradient(0, 0, 0, alto);
-  fondo.addColorStop(0, "#0e1b33");
-  fondo.addColorStop(1, "#08111f");
+  fondo.addColorStop(0, "#0d1931");
+  fondo.addColorStop(1, "#07111f");
   ctx.fillStyle = fondo;
   ctx.fillRect(0, 0, ancho, alto);
 
-  /*
-    Marco exterior.
-  */
-  ctx.strokeStyle = "rgba(108, 209, 255, 0.22)";
+  ctx.strokeStyle = "rgba(108, 209, 255, 0.18)";
   ctx.lineWidth = 1;
-  dibujarRectanguloRedondeado(ctx, 12, 12, ancho - 24, alto - 24, 18);
+  dibujarRectanguloRedondeado(ctx, 16, 16, ancho - 32, alto - 32, 18);
   ctx.stroke();
 
-  /*
-    Título y subtítulo internos del gráfico.
-  */
-  ctx.fillStyle = "#f6fbff";
-  ctx.font = "700 20px Inter";
-  ctx.fillText("Distribución actual de publicaciones", 28, 42);
-
-  ctx.fillStyle = "#8ea6c8";
-  ctx.font = "500 13px Inter";
-  ctx.fillText(
-    totalPublicaciones === 0
-      ? "Todavía no hay publicaciones registradas en el sistema."
-      : `Total registradas: ${totalPublicaciones} publicaciones activas en IndexedDB.`,
-    28,
-    64
-  );
-
-  const area = {
-    izquierda: 72,
-    derecha: ancho - 48,
-    arriba: 96,
-    abajo: alto - 66
+  const areaGrafico = {
+    izquierda: 76,
+    derecha: ancho - 56,
+    arriba: 50,
+    abajo: alto - 82
   };
 
-  const maximo = Math.max(totalOfertas, totalDemandas, 1);
-  const pasos = 4;
-  const alturaArea = area.abajo - area.arriba;
-
-  /*
-    Dibujamos líneas horizontales de referencia.
-  */
-  for (let i = 0; i <= pasos; i += 1) {
-    const valor = Math.round((maximo / pasos) * i);
-    const y = area.abajo - ((alturaArea / pasos) * i);
-
-    ctx.strokeStyle = i === 0 ? "rgba(108, 209, 255, 0.28)" : "rgba(108, 209, 255, 0.12)";
-    ctx.lineWidth = i === 0 ? 1.6 : 1;
-    ctx.beginPath();
-    ctx.moveTo(area.izquierda, y);
-    ctx.lineTo(area.derecha, y);
-    ctx.stroke();
-
-    ctx.fillStyle = "#84a1c9";
-    ctx.font = "500 12px Inter";
-    ctx.textAlign = "right";
-    ctx.fillText(String(valor), area.izquierda - 12, y + 4);
-  }
+  const anchoArea = areaGrafico.derecha - areaGrafico.izquierda;
+  const altoArea = areaGrafico.abajo - areaGrafico.arriba;
+  const anchoBarra = Math.min(160, Math.max(110, Math.floor(anchoArea * 0.22)));
+  const separacionBarras = Math.max(48, Math.floor(anchoArea * 0.12));
+  const anchoConjunto = (anchoBarra * 2) + separacionBarras;
+  const inicioConjunto = areaGrafico.izquierda + ((anchoArea - anchoConjunto) / 2);
 
   const datos = [
     {
       etiqueta: "Ofertas",
       valor: totalOfertas,
-      colorSuperior: "#4ce7ff",
-      colorInferior: "#1b8fff",
-      brillo: "rgba(76, 231, 255, 0.36)",
-      x: area.izquierda + 78
+      colorSuperior: "#58e7ff",
+      colorInferior: "#2498ff",
+      brillo: "rgba(88, 231, 255, 0.34)",
+      x: inicioConjunto
     },
     {
       etiqueta: "Demandas",
       valor: totalDemandas,
-      colorSuperior: "#50ffc3",
-      colorInferior: "#1eb892",
-      brillo: "rgba(80, 255, 195, 0.30)",
-      x: area.izquierda + 278
+      colorSuperior: "#63ffc6",
+      colorInferior: "#26c79e",
+      brillo: "rgba(99, 255, 198, 0.30)",
+      x: inicioConjunto + anchoBarra + separacionBarras
     }
   ];
 
-  const anchoBarra = Math.min(120, Math.max(92, (area.derecha - area.izquierda - 180) / 2));
+  const pasos = 4;
 
-  /*
-    Ajustamos posiciones si el ancho disponible es menor.
-  */
-  if (ancho < 700) {
-    datos[0].x = area.izquierda + 28;
-    datos[1].x = area.izquierda + 168;
+  for (let i = 0; i <= pasos; i += 1) {
+    const valor = Math.round((maximo / pasos) * i);
+    const y = areaGrafico.abajo - ((altoArea / pasos) * i);
+
+    ctx.strokeStyle = i === 0 ? "rgba(108, 209, 255, 0.28)" : "rgba(108, 209, 255, 0.12)";
+    ctx.lineWidth = i === 0 ? 1.6 : 1;
+    ctx.beginPath();
+    ctx.moveTo(areaGrafico.izquierda, y);
+    ctx.lineTo(areaGrafico.derecha, y);
+    ctx.stroke();
+
+    ctx.fillStyle = "#87a4ca";
+    ctx.font = "500 12px Inter";
+    ctx.textAlign = "right";
+    ctx.fillText(String(valor), areaGrafico.izquierda - 12, y + 4);
   }
 
   datos.forEach((dato) => {
-    const alturaBarra = (dato.valor / maximo) * (alturaArea - 24);
-    const x = dato.x;
-    const y = area.abajo - alturaBarra;
+    const alturaBarra = (dato.valor / maximo) * (altoArea - 18);
+    const yBarra = areaGrafico.abajo - alturaBarra;
 
-    const gradienteBarra = ctx.createLinearGradient(x, y, x, area.abajo);
+    const gradienteBarra = ctx.createLinearGradient(dato.x, yBarra, dato.x, areaGrafico.abajo);
     gradienteBarra.addColorStop(0, dato.colorSuperior);
     gradienteBarra.addColorStop(1, dato.colorInferior);
 
     ctx.save();
     ctx.shadowColor = dato.brillo;
-    ctx.shadowBlur = 22;
+    ctx.shadowBlur = 24;
     ctx.fillStyle = gradienteBarra;
-    dibujarRectanguloRedondeado(ctx, x, y, anchoBarra, alturaBarra, 16);
+    dibujarRectanguloRedondeado(ctx, dato.x, yBarra, anchoBarra, alturaBarra, 18);
     ctx.fill();
     ctx.restore();
 
-    /*
-      Brillo superior para dar más profundidad visual.
-    */
-    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-    dibujarRectanguloRedondeado(ctx, x + 6, y + 6, anchoBarra - 12, Math.max(12, alturaBarra * 0.18), 12);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.11)";
+    dibujarRectanguloRedondeado(
+      ctx,
+      dato.x + 8,
+      yBarra + 8,
+      anchoBarra - 16,
+      Math.max(14, alturaBarra * 0.16),
+      14
+    );
     ctx.fill();
 
-    /*
-      Valor numérico encima de la barra.
-    */
     ctx.textAlign = "center";
-    ctx.fillStyle = "#f8fcff";
-    ctx.font = "700 19px Inter";
-    ctx.fillText(String(dato.valor), x + (anchoBarra / 2), y - 12);
+    ctx.fillStyle = "#f7fbff";
+    ctx.font = "700 18px Inter";
+    ctx.fillText(String(dato.valor), dato.x + (anchoBarra / 2), yBarra - 12);
 
-    /*
-      Etiqueta principal debajo de la barra.
-    */
     ctx.fillStyle = "#d8ebff";
     ctx.font = "600 14px Inter";
-    ctx.fillText(dato.etiqueta, x + (anchoBarra / 2), area.abajo + 28);
+    ctx.fillText(dato.etiqueta, dato.x + (anchoBarra / 2), areaGrafico.abajo + 30);
 
-    /*
-      Porcentaje sobre el total.
-    */
     const porcentaje = totalPublicaciones === 0 ? 0 : Math.round((dato.valor / totalPublicaciones) * 100);
     ctx.fillStyle = "#8ea6c8";
     ctx.font = "500 12px Inter";
-    ctx.fillText(`${porcentaje}% del total`, x + (anchoBarra / 2), area.abajo + 48);
+    ctx.fillText(`${porcentaje}% del total`, dato.x + (anchoBarra / 2), areaGrafico.abajo + 50);
   });
 
-  /*
-    Chip informativo superior derecho.
-  */
-  const chipTexto = totalPublicaciones === 0
-    ? "Sin datos disponibles"
-    : `Balance actual · ${totalOfertas} ofertas / ${totalDemandas} demandas`;
-
-  ctx.textAlign = "left";
-  ctx.font = "600 12px Inter";
-  const chipAncho = Math.min(248, ctx.measureText(chipTexto).width + 28);
-  const chipX = ancho - chipAncho - 26;
-  const chipY = 28;
-
-  ctx.fillStyle = "rgba(70, 213, 255, 0.10)";
-  dibujarRectanguloRedondeado(ctx, chipX, chipY, chipAncho, 30, 999);
-  ctx.fill();
-
-  ctx.strokeStyle = "rgba(108, 209, 255, 0.18)";
-  ctx.stroke();
-
-  ctx.fillStyle = "#d8f8ff";
-  ctx.fillText(chipTexto, chipX + 14, chipY + 19);
-
-  /*
-    Mensaje central si todavía no hay datos.
-  */
   if (totalPublicaciones === 0) {
     ctx.textAlign = "center";
-    ctx.fillStyle = "rgba(232, 243, 255, 0.78)";
+    ctx.fillStyle = "rgba(232, 243, 255, 0.82)";
     ctx.font = "600 16px Inter";
     ctx.fillText("Añade publicaciones para generar la comparativa visual.", ancho / 2, alto / 2 + 10);
   }

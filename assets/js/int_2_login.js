@@ -3,6 +3,12 @@ import { configurarBotonCerrarSesion, mostrarAlerta, pintarUsuarioEnNavbar } fro
 
 /*
   Referencias a los elementos HTML de la página de login.
+
+  Estos elementos se usan para:
+  - leer el email y la contraseña escritos por el usuario
+  - detectar el envío del formulario
+  - mostrar mensajes de éxito o error
+  - enseñar en la propia página qué usuario está activo
 */
 const formLogin = document.getElementById("form-login");
 const inputEmail = document.getElementById("email-login");

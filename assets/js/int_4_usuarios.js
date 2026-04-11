@@ -89,7 +89,7 @@ function pintarTablaUsuarios() {
   */
   if (usuarios.length === 0) {
     tablaUsuariosBody.innerHTML = `
-      <tr>
+      <tr class="fila-vacia">
         <td colspan="6" class="text-center text-muted">No hay usuarios registrados.</td>
       </tr>
     `;
@@ -127,9 +127,9 @@ function pintarTablaUsuarios() {
       <td>${usuario.nombre} ${usuario.apellidos}</td>
       <td>${usuario.email}</td>
       <td>${ocultarPassword(usuario.password)}</td>
-      <td><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
-      <td>
-        <button class="btn btn-sm btn-danger" data-email="${usuario.email}">Eliminar</button>
+      <td class="columna-rol"><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
+      <td class="columna-accion">
+        <button class="btn btn-sm btn-action-delete" data-email="${usuario.email}">Eliminar</button>
       </td>
     `;
 

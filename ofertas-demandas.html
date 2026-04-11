@@ -129,6 +129,13 @@
             </p>
           </div>
 
+          <div class="grafico-toolbar">
+            <p>
+              Comparativa visual en tiempo real basada en los datos actualmente registrados en IndexedDB.
+            </p>
+            <span id="estado-grafico" class="status-chip">Sin publicaciones registradas</span>
+          </div>
+
           <div class="canvas-wrapper">
             <canvas id="grafico-publicaciones" width="760" height="420" class="canvas-panel"></canvas>
           </div>
@@ -145,7 +152,7 @@
       </div>
 
       <div class="table-responsive table-wrapper">
-        <table class="table table-striped table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0 tabla-datos tabla-publicaciones">
           <thead>
             <tr>
               <th>ID</th>
@@ -155,11 +162,11 @@
               <th>Email</th>
               <th>Descripción</th>
               <th>Ubicación</th>
-              <th>Acción</th>
+              <th class="columna-accion">Acción</th>
             </tr>
           </thead>
           <tbody id="tabla-publicaciones-body">
-            <tr>
+            <tr class="fila-vacia">
               <td colspan="8" class="text-center text-muted">No hay publicaciones registradas.</td>
             </tr>
           </tbody>
