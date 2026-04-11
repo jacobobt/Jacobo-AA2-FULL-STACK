@@ -118,9 +118,9 @@ function pintarTablaUsuarios() {
     /*
       Construimos el HTML de la fila.
 
-      Mejora funcional:
-      la contraseña ya no se muestra en texto plano,
-      sino en versión visualmente oculta.
+      Mejora aplicada:
+      en la columna de acción usamos una X compacta en rojo,
+      así evitamos que el botón se corte y el diseño queda más limpio.
     */
     fila.innerHTML = `
       <td>${usuario.id}</td>
@@ -129,7 +129,13 @@ function pintarTablaUsuarios() {
       <td>${ocultarPassword(usuario.password)}</td>
       <td class="columna-rol"><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
       <td class="columna-accion">
-        <button class="btn btn-sm btn-action-delete" data-email="${usuario.email}">Eliminar</button>
+        <button
+          class="btn btn-sm btn-action-delete-icon"
+          data-email="${usuario.email}"
+          type="button"
+          aria-label="Eliminar usuario"
+          title="Eliminar usuario"
+        >×</button>
       </td>
     `;
 

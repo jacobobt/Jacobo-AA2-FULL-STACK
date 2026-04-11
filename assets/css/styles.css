@@ -647,6 +647,38 @@ th {
   color: #ffffff;
 }
 
+/*
+  Variante específica para la tabla de usuarios:
+  sustituimos el texto "Eliminar" por una X más compacta,
+  evitando que el botón se corte en la última columna.
+*/
+.btn-action-delete-icon {
+  min-width: 46px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 143, 173, 0.34);
+  background: linear-gradient(135deg, var(--jc-danger), var(--jc-danger-strong));
+  color: #ffffff;
+  font-size: 1.22rem;
+  line-height: 1;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.14);
+  box-shadow: 0 12px 22px rgba(255, 106, 143, 0.22);
+}
+
+.btn-action-delete-icon:hover,
+.btn-action-delete-icon:focus {
+  border-color: rgba(255, 176, 198, 0.42);
+  background: linear-gradient(135deg, #ff88a8, #ff6289);
+  color: #ffffff;
+  transform: translateY(-1px) scale(1.03);
+}
+
 .btn-close.btn-quitar-seleccion {
   filter: invert(1);
   opacity: 0.82;
@@ -750,6 +782,15 @@ textarea.form-control:focus {
 .tabla-datos .fila-vacia td {
   background: rgba(6, 13, 26, 0.86);
   color: var(--jc-muted);
+}
+
+/*
+  Ajuste específico para la tabla de usuarios:
+  reducimos el ancho necesario de la columna de acción
+  al usar una X compacta en lugar del texto "Eliminar".
+*/
+.tabla-usuarios .columna-accion {
+  min-width: 86px;
 }
 
 /* ---------- Dashboard ---------- */
@@ -1028,5 +1069,11 @@ footer {
 
   .status-chip {
     justify-content: center;
+  }
+
+  .btn-action-delete-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
   }
 }
