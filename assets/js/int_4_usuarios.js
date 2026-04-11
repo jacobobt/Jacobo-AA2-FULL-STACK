@@ -135,7 +135,7 @@ function pintarTablaUsuarios() {
           type="button"
           aria-label="Eliminar usuario"
           title="Eliminar usuario"
-        >×</button>
+        >✕</button>
       </td>
     `;
 
