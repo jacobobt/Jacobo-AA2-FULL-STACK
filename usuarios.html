@@ -18,41 +18,25 @@
 </head>
 
 <body>
-  <!-- =========================
-       BARRA DE NAVEGACIÓN
-       =========================
-       Permite:
-       - navegar entre las páginas principales
-       - mostrar el usuario activo
-       - cerrar sesión si existe login
-  -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <!-- Nombre del proyecto -->
       <a class="navbar-brand" href="index.html">JobConnect</a>
 
-      <!-- Botón hamburguesa para móvil -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUsuarios"
         aria-controls="navbarUsuarios" aria-expanded="false" aria-label="Mostrar navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Contenido desplegable de la navbar -->
       <div class="collapse navbar-collapse" id="navbarUsuarios">
-        <!-- Menú principal -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="ofertas-demandas.html">Ofertas/Demandas</a></li>
           <li class="nav-item"><a class="nav-link active" href="usuarios.html">Usuarios</a></li>
         </ul>
 
-        <!-- Zona derecha: usuario activo y botón de cerrar sesión -->
         <div class="d-flex align-items-center gap-2">
-          <!-- Este texto se actualiza dinámicamente con JavaScript -->
           <span class="navbar-text" id="usuarioActivo">Usuario activo: -no login-</span>
-
-          <!-- Este botón empieza oculto y solo se muestra si hay sesión iniciada -->
           <button id="btn-cerrar-sesion" class="btn btn-sm btn-outline-light d-none" type="button">
             Cerrar sesión
           </button>
@@ -61,26 +45,23 @@
     </div>
   </nav>
 
-  <!-- =========================
-       CONTENIDO PRINCIPAL
-       ========================= -->
   <main class="container py-4">
-    <!-- Título principal de la pantalla -->
     <section class="page-intro">
       <h1 class="page-heading">Gestión de usuarios</h1>
       <p class="page-subtitle mb-0">
-        Administra el alta, la consulta y la eliminación de usuarios registrados con persistencia local en el navegador.
+        Administra el alta, la consulta y la eliminación de usuarios registrados con una interfaz más clara, equilibrada
+        y profesional.
       </p>
     </section>
 
     <div class="row g-4">
-      <!-- FORMULARIO -->
       <div class="col-12 col-lg-5">
         <section class="seccion-formulario h-100">
           <div class="section-heading-block">
             <h2 class="section-title">Alta de usuario</h2>
             <p class="section-subtitle">
-              Registra nuevos usuarios mediante un formulario claro, validado y preparado para almacenar los datos localmente.
+              Registra nuevos perfiles con un formulario validado, visualmente limpio y preparado para persistencia en
+              WebStorage.
             </p>
           </div>
 
@@ -123,19 +104,18 @@
         </section>
       </div>
 
-      <!-- TABLA -->
       <div class="col-12 col-lg-7">
         <section class="seccion-listado h-100">
           <div class="section-heading-block">
             <h2 class="section-title">Listado de usuarios</h2>
             <p class="section-subtitle">
-              Consulta los usuarios registrados y gestiona su eliminación desde una vista ordenada y accesible.
+              Consulta los usuarios existentes y gestiona su eliminación desde una vista más ordenada, clara y accesible.
             </p>
           </div>
 
           <div class="table-responsive table-wrapper">
             <table class="table table-striped table-hover align-middle mb-0">
-              <thead class="table-dark">
+              <thead>
                 <tr>
                   <th>ID</th>
                   <th>Nombre completo</th>
@@ -157,20 +137,16 @@
     </div>
   </main>
 
-  <!-- Pie de página -->
   <footer>
     <div class="container text-center">
       FULL STACK ATTACK · JobConnect · Producto 2
     </div>
   </footer>
 
-  <!-- Bootstrap JS para navbar responsive y otros componentes -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
-  <!-- Módulo principal de esta pantalla:
-       controla formulario, tabla y borrado de usuarios -->
   <script type="module" src="assets/js/int_4_usuarios.js"></script>
 </body>
 
