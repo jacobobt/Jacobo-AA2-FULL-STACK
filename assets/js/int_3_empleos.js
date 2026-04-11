@@ -9,13 +9,6 @@ import { capitalizarTexto, configurarBotonCerrarSesion, mostrarAlerta, pintarUsu
 
 /*
   Aquí guardamos referencias a elementos del HTML.
-  document.getElementById(...) busca en la página un elemento por su id.
-
-  Gracias a esto luego podemos:
-  - leer lo que escribe el usuario en los inputs
-  - modificar tablas
-  - mostrar mensajes
-  - dibujar el gráfico
 */
 const formPublicacion = document.getElementById("form-publicacion");
 const tipoPublicacion = document.getElementById("tipo-publicacion");
@@ -29,19 +22,16 @@ const emailPublicacion = document.getElementById("email-publicacion");
 const tablaPublicacionesBody = document.getElementById("tabla-publicaciones-body");
 const mensajePublicacion = document.getElementById("mensaje-publicacion");
 const canvasGrafico = document.getElementById("grafico-publicaciones");
+const estadoGrafico = document.getElementById("estado-grafico");
+
+/*
+  Temporizador para evitar redibujar demasiadas veces seguidas el gráfico
+  cuando cambia el tamaño de la ventana.
+*/
+let resizeTimeoutId = null;
 
 /*
   Esta función se ejecuta al cargar la página.
-  Es la función principal de arranque de esta pantalla.
-
-  Se encarga de:
-  1. preparar el almacenamiento inicial
-  2. pintar el usuario en la barra de navegación
-  3. preparar el botón de cerrar sesión
-  4. rellenar algunos datos automáticos del formulario
-  5. pintar la tabla de publicaciones
-  6. pintar el gráfico en canvas
-  7. escuchar el envío del formulario
 */
 async function inicializarPaginaPublicaciones() {
   await inicializarAlmacenamiento();
@@ -51,42 +41,26 @@ async function inicializarPaginaPublicaciones() {
   await pintarTablaPublicaciones();
   await pintarGraficoCanvas();
 
-  /*
-    Aquí escuchamos el evento submit del formulario.
-    Cuando el usuario pulse el botón de enviar,
-    se ejecutará gestionarAltaPublicacion.
-  */
   formPublicacion.addEventListener("submit", gestionarAltaPublicacion);
+
+  window.addEventListener("resize", () => {
+    if (resizeTimeoutId) {
+      window.clearTimeout(resizeTimeoutId);
+    }
+
+    resizeTimeoutId = window.setTimeout(() => {
+      pintarGraficoCanvas();
+    }, 150);
+  });
 }
 
 /*
   Esta función rellena automáticamente algunos campos del formulario.
-
-  Hace dos cosas:
-  1. pone la fecha de hoy en el input de fecha
-  2. si hay usuario activo, rellena autor y email con sus datos
 */
 function completarDatosSugeridos() {
-  /*
-    new Date() crea la fecha actual.
-    toISOString() la convierte a texto tipo:
-    "2026-04-08T10:30:00.000Z"
-
-    split("T")[0] se queda solo con la parte de la fecha:
-    "2026-04-08"
-  */
   fechaPublicacion.value = new Date().toISOString().split("T")[0];
-
-  /*
-    Obtenemos el usuario activo desde localStorage
-    usando la función del módulo almacenaje.js
-  */
   const usuarioActivo = obtenerUsuarioActivo();
 
-  /*
-    Si hay un usuario logueado, rellenamos automáticamente
-    el autor y el email para no tener que escribirlos a mano.
-  */
   if (usuarioActivo) {
     autorPublicacion.value = `${usuarioActivo.nombre} ${usuarioActivo.apellidos}`;
     emailPublicacion.value = usuarioActivo.email;
@@ -94,11 +68,7 @@ function completarDatosSugeridos() {
 }
 
 /*
-  Esta función recoge todos los datos escritos en el formulario
-  y los devuelve en un objeto.
-
-  Es muy útil porque así luego podemos pasar todos los datos
-  de golpe a crearPublicacion(...).
+  Esta función recoge todos los datos escritos en el formulario.
 */
 function obtenerDatosFormulario() {
   return {
@@ -115,146 +85,73 @@ function obtenerDatosFormulario() {
 
 /*
   Esta función pinta la tabla HTML con todas las publicaciones.
-
-  Hace esto:
-  1. pide las publicaciones a IndexedDB
-  2. si no hay ninguna, muestra una fila indicando que está vacío
-  3. si sí hay, crea una fila por cada publicación
-  4. añade un botón eliminar a cada fila
 */
 async function pintarTablaPublicaciones() {
   const publicaciones = await listarPublicaciones();
 
-  /*
-    Si no hay publicaciones, metemos una única fila informativa
-    dentro del cuerpo de la tabla.
-  */
   if (publicaciones.length === 0) {
     tablaPublicacionesBody.innerHTML = `
-      <tr>
+      <tr class="fila-vacia">
         <td colspan="8" class="text-center text-muted">No hay ofertas o demandas registradas.</td>
       </tr>
     `;
     return;
   }
 
-  /*
-    Si sí hay publicaciones, vaciamos antes la tabla
-    para evitar duplicados al repintar.
-  */
   tablaPublicacionesBody.innerHTML = "";
 
-  /*
-    Recorremos el array de publicaciones.
-    Por cada publicación, creamos una fila <tr>.
-  */
   publicaciones.forEach((publicacion) => {
     const fila = document.createElement("tr");
-
-    /*
-      Elegimos una clase CSS diferente según el tipo:
-      - oferta -> badge-oferta
-      - demanda -> badge-demanda
-    */
     const badgeClase = publicacion.tipo === "oferta" ? "badge-oferta" : "badge-demanda";
 
-    /*
-      innerHTML nos permite meter el contenido HTML de la fila.
-      Aquí mostramos los datos de la publicación en distintas columnas.
-    */
     fila.innerHTML = `
       <td>${publicacion.id}</td>
       <td><span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span></td>
       <td>${publicacion.titulo}</td>
       <td>${publicacion.fecha}</td>
-      <td>${publicacion.emailContacto}</td>
-      <td>${publicacion.descripcion}</td>
+      <td class="columna-email">${publicacion.emailContacto}</td>
+      <td class="columna-descripcion">${publicacion.descripcion}</td>
       <td>${publicacion.ubicacion}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" data-id="${publicacion.id}">Eliminar</button>
+      <td class="columna-accion">
+        <button class="btn btn-sm btn-action-delete" data-id="${publicacion.id}">Eliminar</button>
       </td>
     `;
 
-    /*
-      Buscamos el botón eliminar que acabamos de crear dentro de esta fila.
-    */
     const botonEliminar = fila.querySelector("button");
 
-    /*
-      Cuando el usuario pulse ese botón, se llamará a la función
-      que elimina la publicación por id.
-
-      También pasamos el título para mostrar una confirmación más clara.
-    */
     botonEliminar.addEventListener("click", async () => {
       await gestionarBorradoPublicacion(publicacion.id, publicacion.titulo);
     });
 
-    /*
-      Finalmente añadimos la fila al cuerpo de la tabla.
-    */
     tablaPublicacionesBody.appendChild(fila);
   });
 }
 
 /*
-  Esta función se ejecuta cuando se envía el formulario
-  para crear una nueva publicación.
+  Esta función se ejecuta cuando se envía el formulario.
 */
 async function gestionarAltaPublicacion(evento) {
-  /*
-    Evita que el formulario recargue la página al enviarse,
-    que es el comportamiento por defecto del navegador.
-  */
   evento.preventDefault();
 
   try {
-    /*
-      Creamos la publicación con los datos del formulario.
-    */
     await crearPublicacion(obtenerDatosFormulario());
-
-    /*
-      Después de guardar:
-      - repintamos la tabla
-      - repintamos el gráfico
-    */
     await pintarTablaPublicaciones();
     await pintarGraficoCanvas();
-
-    /*
-      Reseteamos el formulario, es decir, vaciamos sus campos.
-    */
     formPublicacion.reset();
-
-    /*
-      Volvemos a poner los datos sugeridos:
-      fecha actual, autor y email si hay usuario activo.
-    */
     completarDatosSugeridos();
 
-    /*
-      Mostramos un mensaje de éxito.
-    */
     mostrarAlerta(
       mensajePublicacion,
       "Publicación guardada correctamente en IndexedDB.",
       "success"
     );
   } catch (error) {
-    /*
-      Si algo falla, mostramos el mensaje de error.
-    */
     mostrarAlerta(mensajePublicacion, error.message, "danger");
   }
 }
 
 /*
   Esta función elimina una publicación por su id.
-
-  Mejora funcional:
-  antes de borrar, pedimos confirmación al usuario
-  para evitar eliminaciones accidentales.
 */
 async function gestionarBorradoPublicacion(idPublicacion, tituloPublicacion) {
   const confirmarBorrado = window.confirm(
@@ -267,160 +164,215 @@ async function gestionarBorradoPublicacion(idPublicacion, tituloPublicacion) {
   }
 
   try {
-    /*
-      Eliminamos la publicación en IndexedDB.
-    */
     await eliminarPublicacion(idPublicacion);
-
-    /*
-      Luego actualizamos la tabla y el gráfico para reflejar el cambio.
-    */
     await pintarTablaPublicaciones();
     await pintarGraficoCanvas();
 
-    /*
-      Mostramos mensaje de éxito.
-    */
     mostrarAlerta(
       mensajePublicacion,
       `Publicación "${tituloPublicacion}" eliminada correctamente.`,
       "success"
     );
   } catch (error) {
-    /*
-      Si algo falla, mostramos error.
-    */
     mostrarAlerta(mensajePublicacion, error.message, "danger");
   }
 }
 
 /*
-  Esta función dibuja un gráfico sencillo en un canvas HTML5.
+  Ajusta el tamaño interno del canvas para que se vea nítido
+  en cualquier resolución o densidad de píxeles.
+*/
+function prepararCanvasHD(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const anchoVisual = canvas.clientWidth || canvas.width || 760;
+  const altoVisual = canvas.clientHeight || canvas.height || 420;
 
-  El gráfico muestra:
-  - total de ofertas
-  - total de demandas
+  canvas.width = Math.round(anchoVisual * dpr);
+  canvas.height = Math.round(altoVisual * dpr);
 
-  Cada uno como una barra vertical.
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+
+  return {
+    ctx,
+    ancho: anchoVisual,
+    alto: altoVisual
+  };
+}
+
+/*
+  Dibuja un rectángulo con esquinas redondeadas.
+*/
+function dibujarRectanguloRedondeado(ctx, x, y, ancho, alto, radio) {
+  const radioSeguro = Math.min(radio, ancho / 2, alto / 2);
+
+  ctx.beginPath();
+  ctx.moveTo(x + radioSeguro, y);
+  ctx.lineTo(x + ancho - radioSeguro, y);
+  ctx.quadraticCurveTo(x + ancho, y, x + ancho, y + radioSeguro);
+  ctx.lineTo(x + ancho, y + alto - radioSeguro);
+  ctx.quadraticCurveTo(x + ancho, y + alto, x + ancho - radioSeguro, y + alto);
+  ctx.lineTo(x + radioSeguro, y + alto);
+  ctx.quadraticCurveTo(x, y + alto, x, y + alto - radioSeguro);
+  ctx.lineTo(x, y + radioSeguro);
+  ctx.quadraticCurveTo(x, y, x + radioSeguro, y);
+  ctx.closePath();
+}
+
+/*
+  Actualiza el chip superior del gráfico con un resumen rápido.
+*/
+function actualizarEstadoGrafico(totalOfertas, totalDemandas) {
+  if (!estadoGrafico) {
+    return;
+  }
+
+  const totalPublicaciones = totalOfertas + totalDemandas;
+
+  if (totalPublicaciones === 0) {
+    estadoGrafico.textContent = "Sin publicaciones registradas";
+    return;
+  }
+
+  estadoGrafico.textContent = `${totalOfertas} ofertas · ${totalDemandas} demandas · ${totalPublicaciones} en total`;
+}
+
+/*
+  Esta función dibuja un gráfico más completo, mejor distribuido
+  y visualmente más equilibrado.
 */
 async function pintarGraficoCanvas() {
-  /*
-    Comprobamos que el canvas existe y que soporta getContext.
-    Si no existe o no se puede usar, salimos.
-  */
   if (!canvasGrafico || !canvasGrafico.getContext) {
     return;
   }
 
-  /*
-    Leemos todas las publicaciones para calcular cuántas ofertas
-    y cuántas demandas hay.
-  */
   const publicaciones = await listarPublicaciones();
   const totalOfertas = publicaciones.filter((publicacion) => publicacion.tipo === "oferta").length;
   const totalDemandas = publicaciones.filter((publicacion) => publicacion.tipo === "demanda").length;
+  const totalPublicaciones = totalOfertas + totalDemandas;
 
-  /*
-    getContext("2d") devuelve el contexto de dibujo 2D del canvas.
-    Con ctx podremos dibujar rectángulos, texto, líneas, etc.
-  */
-  const ctx = canvasGrafico.getContext("2d");
+  actualizarEstadoGrafico(totalOfertas, totalDemandas);
 
-  /*
-    Guardamos ancho y alto del canvas para usar esas medidas
-    al dibujar.
-  */
-  const ancho = canvasGrafico.width;
-  const alto = canvasGrafico.height;
-
-  /*
-    Limpiamos completamente el canvas.
-  */
-  ctx.clearRect(0, 0, ancho, alto);
-
-  /*
-    Pintamos un fondo blanco en todo el canvas.
-  */
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, ancho, alto);
-
-  /*
-    Escribimos el título del gráfico.
-  */
-  ctx.font = "bold 18px Arial";
-  ctx.fillStyle = "#212529";
-  ctx.fillText("Gráfico de ofertas y demandas", 20, 30);
-
-  /*
-    maximo será el mayor valor entre ofertas y demandas.
-    Sirve para calcular la altura proporcional de las barras.
-
-    Ponemos también 1 para evitar divisiones raras si ambos son 0.
-  */
+  const { ctx, ancho, alto } = prepararCanvasHD(canvasGrafico);
   const maximo = Math.max(totalOfertas, totalDemandas, 1);
 
-  /*
-    Definimos varias medidas y posiciones para el dibujo.
-  */
-  const baseY = alto - 40;
-  const alturaMaxima = 160;
-  const anchoBarra = 120;
-  const separacion = 80;
-  const xOferta = 50;
-  const xDemanda = xOferta + anchoBarra + separacion;
+  ctx.clearRect(0, 0, ancho, alto);
 
-  /*
-    Calculamos la altura de cada barra de forma proporcional.
-    Si una categoría tiene más elementos, su barra será más alta.
-  */
-  const alturaOferta = (totalOfertas / maximo) * alturaMaxima;
-  const alturaDemanda = (totalDemandas / maximo) * alturaMaxima;
+  const fondo = ctx.createLinearGradient(0, 0, 0, alto);
+  fondo.addColorStop(0, "#0d1931");
+  fondo.addColorStop(1, "#07111f");
+  ctx.fillStyle = fondo;
+  ctx.fillRect(0, 0, ancho, alto);
 
-  /*
-    Dibujamos una línea horizontal que actúa como base del gráfico.
-  */
-  ctx.strokeStyle = "#adb5bd";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(20, baseY);
-  ctx.lineTo(ancho - 20, baseY);
+  ctx.strokeStyle = "rgba(108, 209, 255, 0.18)";
+  ctx.lineWidth = 1;
+  dibujarRectanguloRedondeado(ctx, 16, 16, ancho - 32, alto - 32, 18);
   ctx.stroke();
 
-  /*
-    Dibujamos la barra azul de ofertas.
-    fillRect(x, y, ancho, alto)
+  const areaGrafico = {
+    izquierda: 76,
+    derecha: ancho - 56,
+    arriba: 50,
+    abajo: alto - 82
+  };
 
-    Ojo:
-    el eje Y en canvas crece hacia abajo,
-    por eso restamos altura a baseY.
-  */
-  ctx.fillStyle = "#0d6efd";
-  ctx.fillRect(xOferta, baseY - alturaOferta, anchoBarra, alturaOferta);
+  const anchoArea = areaGrafico.derecha - areaGrafico.izquierda;
+  const altoArea = areaGrafico.abajo - areaGrafico.arriba;
+  const anchoBarra = Math.min(160, Math.max(110, Math.floor(anchoArea * 0.22)));
+  const separacionBarras = Math.max(48, Math.floor(anchoArea * 0.12));
+  const anchoConjunto = (anchoBarra * 2) + separacionBarras;
+  const inicioConjunto = areaGrafico.izquierda + ((anchoArea - anchoConjunto) / 2);
 
-  /*
-    Dibujamos la barra verde de demandas.
-  */
-  ctx.fillStyle = "#198754";
-  ctx.fillRect(xDemanda, baseY - alturaDemanda, anchoBarra, alturaDemanda);
+  const datos = [
+    {
+      etiqueta: "Ofertas",
+      valor: totalOfertas,
+      colorSuperior: "#58e7ff",
+      colorInferior: "#2498ff",
+      brillo: "rgba(88, 231, 255, 0.34)",
+      x: inicioConjunto
+    },
+    {
+      etiqueta: "Demandas",
+      valor: totalDemandas,
+      colorSuperior: "#63ffc6",
+      colorInferior: "#26c79e",
+      brillo: "rgba(99, 255, 198, 0.30)",
+      x: inicioConjunto + anchoBarra + separacionBarras
+    }
+  ];
 
-  /*
-    Escribimos las etiquetas inferiores con el total de cada tipo.
-  */
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#212529";
-  ctx.fillText(`Ofertas: ${totalOfertas}`, xOferta, baseY + 25);
-  ctx.fillText(`Demandas: ${totalDemandas}`, xDemanda, baseY + 25);
+  const pasos = 4;
 
-  /*
-    Escribimos el número encima de cada barra.
-  */
-  ctx.font = "bold 18px Arial";
-  ctx.fillText(String(totalOfertas), xOferta + 35, baseY - alturaOferta - 10);
-  ctx.fillText(String(totalDemandas), xDemanda + 35, baseY - alturaDemanda - 10);
+  for (let i = 0; i <= pasos; i += 1) {
+    const valor = Math.round((maximo / pasos) * i);
+    const y = areaGrafico.abajo - ((altoArea / pasos) * i);
+
+    ctx.strokeStyle = i === 0 ? "rgba(108, 209, 255, 0.28)" : "rgba(108, 209, 255, 0.12)";
+    ctx.lineWidth = i === 0 ? 1.6 : 1;
+    ctx.beginPath();
+    ctx.moveTo(areaGrafico.izquierda, y);
+    ctx.lineTo(areaGrafico.derecha, y);
+    ctx.stroke();
+
+    ctx.fillStyle = "#87a4ca";
+    ctx.font = "500 12px Inter";
+    ctx.textAlign = "right";
+    ctx.fillText(String(valor), areaGrafico.izquierda - 12, y + 4);
+  }
+
+  datos.forEach((dato) => {
+    const alturaBarra = (dato.valor / maximo) * (altoArea - 18);
+    const yBarra = areaGrafico.abajo - alturaBarra;
+
+    const gradienteBarra = ctx.createLinearGradient(dato.x, yBarra, dato.x, areaGrafico.abajo);
+    gradienteBarra.addColorStop(0, dato.colorSuperior);
+    gradienteBarra.addColorStop(1, dato.colorInferior);
+
+    ctx.save();
+    ctx.shadowColor = dato.brillo;
+    ctx.shadowBlur = 24;
+    ctx.fillStyle = gradienteBarra;
+    dibujarRectanguloRedondeado(ctx, dato.x, yBarra, anchoBarra, alturaBarra, 18);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.11)";
+    dibujarRectanguloRedondeado(
+      ctx,
+      dato.x + 8,
+      yBarra + 8,
+      anchoBarra - 16,
+      Math.max(14, alturaBarra * 0.16),
+      14
+    );
+    ctx.fill();
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#f7fbff";
+    ctx.font = "700 18px Inter";
+    ctx.fillText(String(dato.valor), dato.x + (anchoBarra / 2), yBarra - 12);
+
+    ctx.fillStyle = "#d8ebff";
+    ctx.font = "600 14px Inter";
+    ctx.fillText(dato.etiqueta, dato.x + (anchoBarra / 2), areaGrafico.abajo + 30);
+
+    const porcentaje = totalPublicaciones === 0 ? 0 : Math.round((dato.valor / totalPublicaciones) * 100);
+    ctx.fillStyle = "#8ea6c8";
+    ctx.font = "500 12px Inter";
+    ctx.fillText(`${porcentaje}% del total`, dato.x + (anchoBarra / 2), areaGrafico.abajo + 50);
+  });
+
+  if (totalPublicaciones === 0) {
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(232, 243, 255, 0.82)";
+    ctx.font = "600 16px Inter";
+    ctx.fillText("Añade publicaciones para generar la comparativa visual.", ancho / 2, alto / 2 + 10);
+  }
 }
 
 /*
   DOMContentLoaded se dispara cuando el HTML ya está cargado.
-  En ese momento arrancamos toda la lógica de esta página.
 */
 window.addEventListener("DOMContentLoaded", inicializarPaginaPublicaciones);

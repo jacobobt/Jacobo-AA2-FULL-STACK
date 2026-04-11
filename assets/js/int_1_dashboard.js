@@ -41,11 +41,6 @@ const contenedorSeleccionadas = document.getElementById("contenedor-seleccionada
 
   Esto es importante porque el drag and drop se apoya en la zona visual completa,
   no solo en el contenedor interno de tarjetas.
-
-  Así:
-  - el área de drop es más grande
-  - la experiencia al arrastrar mejora
-  - el resaltado visual se aplica a toda la caja de destino
 */
 const zonaDisponibles = contenedorDisponibles.closest(".drop-zone");
 const zonaSeleccionadas = contenedorSeleccionadas.closest(".drop-zone");
@@ -57,28 +52,16 @@ const mensajeDashboard = document.getElementById("mensaje-dashboard");
 
 /*
   Lista de botones de filtro.
-  Se seleccionan con querySelectorAll porque puede haber varios.
 */
 const botonesFiltro = document.querySelectorAll("[data-filtro]");
 
 /*
   Guarda qué filtro está activo en este momento.
-  Empieza en "todas", pero luego intentaremos recuperar
-  el último valor guardado en localStorage.
 */
 let filtroActual = "todas";
 
 /*
   Función principal de arranque del dashboard.
-
-  Hace estas tareas:
-  1. prepara el almacenamiento inicial
-  2. pinta el usuario activo en la navbar
-  3. configura el botón de cerrar sesión
-  4. recupera el filtro guardado
-  5. configura los filtros
-  6. configura las zonas de drag and drop
-  7. pinta el resumen y las tarjetas
 */
 async function inicializarDashboard() {
   await inicializarAlmacenamiento();
@@ -93,8 +76,6 @@ async function inicializarDashboard() {
 
 /*
   Recupera desde localStorage el último filtro usado por el usuario.
-
-  Si el valor guardado no es válido, se mantiene "todas".
 */
 function recuperarFiltroGuardado() {
   const filtroGuardado = localStorage.getItem(CLAVE_FILTRO_DASHBOARD);
@@ -117,13 +98,6 @@ function guardarFiltroActual() {
 
 /*
   Configura los botones de filtro.
-
-  Por cada botón:
-  - escucha el click
-  - actualiza filtroActual según su data-filtro
-  - guarda el filtro elegido
-  - cambia el aspecto visual de los botones
-  - vuelve a pintar las tarjetas
 */
 function configurarFiltros() {
   botonesFiltro.forEach((boton) => {
@@ -138,12 +112,6 @@ function configurarFiltros() {
 
 /*
   Cambia el estilo de los botones según cuál está activo.
-
-  Si el botón coincide con filtroActual:
-  - se pone como activo con btn-primary
-
-  Si no coincide:
-  - se deja como secundario con borde usando btn-outline-primary
 */
 function actualizarEstadoVisualFiltros() {
   botonesFiltro.forEach((boton) => {
@@ -158,135 +126,46 @@ function actualizarEstadoVisualFiltros() {
 }
 
 /*
-  Configura el comportamiento drag and drop de las dos zonas:
-  - zona de disponibles
-  - zona de seleccionadas
-
-  Aquí está una de las partes más importantes del dashboard.
+  Configura el comportamiento drag and drop de las dos zonas.
 */
 function configurarZonasDrop() {
-  /*
-    Recorremos las dos zonas drop.
-    A ambas les damos comportamiento común:
-    - dragover
-    - dragleave
-  */
   [zonaDisponibles, zonaSeleccionadas].forEach((zona) => {
     zona.addEventListener("dragover", (evento) => {
-      /*
-        preventDefault() es obligatorio en drag and drop
-        para permitir que esta zona acepte el drop.
-      */
       evento.preventDefault();
-
-      /*
-        Añadimos una clase visual mientras la tarjeta pasa por encima,
-        para que el usuario vea que esa zona acepta el drop.
-      */
       zona.classList.add("drop-zone-activa");
     });
 
     zona.addEventListener("dragleave", (evento) => {
-      /*
-        Esta mejora evita que el resaltado se quite antes de tiempo.
-
-        evento.relatedTarget es el elemento al que se mueve el puntero.
-        Si ese nuevo elemento sigue estando dentro de la misma zona,
-        NO quitamos la clase.
-
-        Solo quitamos el resaltado si realmente se salió de la zona completa.
-      */
       if (!zona.contains(evento.relatedTarget)) {
         zona.classList.remove("drop-zone-activa");
       }
     });
   });
 
-  /*
-    Qué pasa cuando soltamos una tarjeta en la zona de disponibles.
-
-    Lógica:
-    - significa que la publicación deja de estar seleccionada
-    - se elimina del store de seleccionadas
-    - se repinta el dashboard
-  */
   zonaDisponibles.addEventListener("drop", async (evento) => {
     evento.preventDefault();
-
-    /*
-      Quitamos el resaltado visual de la zona.
-    */
     zonaDisponibles.classList.remove("drop-zone-activa");
-
-    /*
-      Recuperamos el id de la publicación arrastrada
-      desde dataTransfer.
-    */
     const id = evento.dataTransfer.getData("text/plain");
 
     try {
-      /*
-        Quitamos la publicación de la selección.
-      */
       await quitarPublicacionSeleccionada(id);
-
-      /*
-        Actualizamos pantalla: resumen + tarjetas.
-      */
       await repintarDashboard();
-
-      /*
-        Mostramos mensaje de éxito.
-      */
       mostrarAlerta(mensajeDashboard, "Publicación devuelta al listado general.", "success");
     } catch (error) {
-      /*
-        Si algo falla, mostramos error.
-      */
       mostrarAlerta(mensajeDashboard, error.message, "danger");
     }
   });
 
-  /*
-    Qué pasa cuando soltamos una tarjeta en la zona de seleccionadas.
-
-    Lógica:
-    - significa que el usuario quiere guardarla en su selección
-    - se guarda en el store de seleccionadas
-    - se repinta el dashboard
-  */
   zonaSeleccionadas.addEventListener("drop", async (evento) => {
     evento.preventDefault();
-
-    /*
-      Quitamos el resaltado visual de la zona.
-    */
     zonaSeleccionadas.classList.remove("drop-zone-activa");
-
-    /*
-      Recuperamos el id de la publicación arrastrada.
-    */
     const id = evento.dataTransfer.getData("text/plain");
 
     try {
-      /*
-        Guardamos la publicación como seleccionada.
-      */
       await anadirPublicacionSeleccionada(id);
-
-      /*
-        Repintamos dashboard para reflejar el cambio.
-      */
       await repintarDashboard();
-
-      /*
-        Mostramos mensaje de éxito.
-      */
       mostrarAlerta(mensajeDashboard, "Publicación añadida a la selección del usuario.", "success");
     } catch (error) {
-      /*
-        Si algo falla, mostramos error.
-      */
       mostrarAlerta(mensajeDashboard, error.message, "danger");
     }
   });
@@ -306,7 +185,11 @@ async function moverASeleccionadas(idPublicacion) {
 }
 
 /*
-  Devuelve una publicación al bloque de disponibles usando doble clic.
+  Devuelve una publicación al bloque de disponibles.
+
+  Esta función se reutiliza en dos acciones distintas:
+  - doble clic sobre una tarjeta seleccionada
+  - botón con X dentro de la propia tarjeta seleccionada
 */
 async function moverADisponibles(idPublicacion) {
   try {
@@ -320,13 +203,6 @@ async function moverADisponibles(idPublicacion) {
 
 /*
   Repinta todo el dashboard.
-
-  Reutiliza:
-  - pintarResumen()
-  - pintarTarjetas()
-
-  Esto es útil porque cuando cambias algo,
-  normalmente quieres actualizar ambas partes.
 */
 async function repintarDashboard() {
   await pintarResumen();
@@ -347,22 +223,12 @@ async function pintarResumen() {
 }
 
 /*
-  Pinta las tarjetas de ambas zonas:
-  - disponibles
-  - seleccionadas
-
-  Además aplica el filtro actual a las disponibles.
+  Pinta las tarjetas de ambas zonas.
 */
 async function pintarTarjetas() {
   const publicacionesDisponibles = await listarPublicacionesDisponibles();
   const publicacionesSeleccionadas = await listarPublicacionesSeleccionadas();
 
-  /*
-    Filtramos solo las disponibles.
-
-    Si filtroActual es "todas", se dejan pasar todas.
-    Si no, se dejan solo las del tipo elegido.
-  */
   const disponiblesFiltradas = publicacionesDisponibles.filter((publicacion) => {
     if (filtroActual === "todas") {
       return true;
@@ -371,10 +237,6 @@ async function pintarTarjetas() {
     return publicacion.tipo === filtroActual;
   });
 
-  /*
-    Pintamos tarjetas en la zona de disponibles.
-    Si no hay publicaciones, se mostrará el texto vacío.
-  */
   renderizarTarjetas(
     contenedorDisponibles,
     disponiblesFiltradas,
@@ -382,9 +244,6 @@ async function pintarTarjetas() {
     "disponibles"
   );
 
-  /*
-    Pintamos tarjetas en la zona de seleccionadas.
-  */
   renderizarTarjetas(
     contenedorSeleccionadas,
     publicacionesSeleccionadas,
@@ -395,61 +254,45 @@ async function pintarTarjetas() {
 
 /*
   Crea visualmente las tarjetas HTML dentro del contenedor indicado.
-
-  Parámetros:
-  - contenedor: dónde se van a insertar las tarjetas
-  - publicaciones: array de publicaciones a mostrar
-  - textoVacio: mensaje que se mostrará si no hay elementos
-  - origen: indica si la tarjeta pertenece al bloque de disponibles
-    o al bloque de seleccionadas
 */
 function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
-  /*
-    Si no hay publicaciones, mostramos un mensaje
-    dentro del contenedor.
-  */
   if (publicaciones.length === 0) {
     contenedor.innerHTML = `
-      <div class="alert alert-secondary mb-0">${textoVacio}</div>
+      <div class="col-12">
+        <div class="alert alert-secondary mb-0">${textoVacio}</div>
+      </div>
     `;
     return;
   }
 
-  /*
-    Si sí hay publicaciones, vaciamos primero el contenedor
-    para evitar duplicados.
-  */
   contenedor.innerHTML = "";
 
-  /*
-    Recorremos todas las publicaciones
-    y creamos una tarjeta por cada una.
-  */
   publicaciones.forEach((publicacion) => {
     const columna = document.createElement("div");
     columna.className = "col-12";
 
-    /*
-      Elegimos una clase CSS para el badge
-      según sea oferta o demanda.
-    */
     const badgeClase = publicacion.tipo === "oferta" ? "badge-oferta" : "badge-demanda";
 
-    /*
-      Construimos el HTML de la tarjeta.
+    const botonQuitarSeleccion = origen === "seleccionadas"
+      ? `
+        <button
+          type="button"
+          class="btn-close btn-quitar-seleccion"
+          aria-label="Devolver publicación al listado general"
+          title="Devolver al listado general"
+        ></button>
+      `
+      : "";
 
-      draggable="true" es clave:
-      permite que la tarjeta se pueda arrastrar.
-
-      data-id guarda el id en el HTML,
-      aunque el valor importante luego se mete en dataTransfer.
-    */
     columna.innerHTML = `
       <article class="card card-publicacion h-100 tarjeta-arrastrable" draggable="true" data-id="${publicacion.id}">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap">
-            <span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span>
-            <small class="text-muted">${publicacion.fecha}</small>
+        <div class="card-body position-relative">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap tarjeta-cabecera-publicacion">
+            <div class="d-flex align-items-start gap-2 flex-wrap pe-4">
+              <span class="badge ${badgeClase}">${capitalizarTexto(publicacion.tipo)}</span>
+              <small class="text-muted">${publicacion.fecha}</small>
+            </div>
+            ${botonQuitarSeleccion}
           </div>
           <h3 class="h5">${publicacion.titulo}</h3>
           <p class="mb-2"><strong>Categoría:</strong> ${publicacion.categoria}</p>
@@ -461,45 +304,18 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
       </article>
     `;
 
-    /*
-      Buscamos el article que actuará como tarjeta arrastrable.
-    */
     const tarjeta = columna.querySelector(".tarjeta-arrastrable");
+    const botonCerrar = columna.querySelector(".btn-quitar-seleccion");
 
-    /*
-      dragstart ocurre cuando el usuario empieza a arrastrar la tarjeta.
-
-      Aquí guardamos el id de la publicación en dataTransfer,
-      que es como la "mochila" temporal del arrastre.
-
-      Después, en el drop, recuperaremos este mismo id.
-    */
     tarjeta.addEventListener("dragstart", (evento) => {
       evento.dataTransfer.setData("text/plain", String(publicacion.id));
-
-      /*
-        Añadimos clase visual para dar feedback mientras se arrastra.
-      */
       tarjeta.classList.add("tarjeta-dragging");
     });
 
-    /*
-      dragend ocurre cuando termina el arrastre,
-      tanto si se soltó bien como si no.
-
-      Quitamos la clase visual.
-    */
     tarjeta.addEventListener("dragend", () => {
       tarjeta.classList.remove("tarjeta-dragging");
     });
 
-    /*
-      Mejora funcional:
-      además del drag & drop, permitimos mover la tarjeta con doble clic.
-
-      - Si la tarjeta está en "disponibles", pasa a "seleccionadas"
-      - Si la tarjeta está en "seleccionadas", vuelve a "disponibles"
-    */
     tarjeta.addEventListener("dblclick", async () => {
       if (origen === "disponibles") {
         await moverASeleccionadas(publicacion.id);
@@ -508,9 +324,19 @@ function renderizarTarjetas(contenedor, publicaciones, textoVacio, origen) {
       }
     });
 
-    /*
-      Añadimos la tarjeta ya montada al contenedor.
-    */
+    if (botonCerrar) {
+      botonCerrar.addEventListener("dblclick", (evento) => {
+        evento.preventDefault();
+        evento.stopPropagation();
+      });
+
+      botonCerrar.addEventListener("click", async (evento) => {
+        evento.preventDefault();
+        evento.stopPropagation();
+        await moverADisponibles(publicacion.id);
+      });
+    }
+
     contenedor.appendChild(columna);
   });
 }
