@@ -41,21 +41,22 @@
   </nav>
 
   <main class="container py-4">
-    <section class="mb-4 text-center">
-      <h1 class="h3 page-heading mb-1">Acceso a la aplicación</h1>
+    <section class="page-intro">
+      <h1 class="page-heading">Acceso a la aplicación</h1>
       <p class="page-subtitle mb-0">
-        Inicio de sesión y consulta del estado actual de la sesión.
+        Gestiona el inicio de sesión y consulta en todo momento el estado actual del usuario autenticado.
       </p>
     </section>
 
     <div class="row justify-content-center g-4">
       <div class="col-12 col-lg-7">
         <div class="seccion-formulario h-100 login-panel">
-          <h2 class="h4 mb-3 text-center">Iniciar sesión</h2>
-
-          <p class="text-muted text-center">
-            Esta pantalla valida usuarios guardados en WebStorage y mantiene el usuario activo en localStorage.
-          </p>
+          <div class="section-heading-block">
+            <h2 class="section-title">Iniciar sesión</h2>
+            <p class="section-subtitle">
+              Introduce tus credenciales para validar el acceso con los datos almacenados en WebStorage.
+            </p>
+          </div>
 
           <form id="form-login" novalidate>
             <div class="mb-3">
@@ -78,9 +79,15 @@
       </div>
 
       <div class="col-12 col-lg-5">
-        <div class="section-card h-100 session-panel">
-          <h2 class="h5 mb-3">Estado de la sesión</h2>
-          <p id="usuario-activo-pagina" class="mb-0 text-muted">
+        <div class="section-card h-100 session-panel p-4">
+          <div class="section-heading-block mb-3">
+            <h2 class="section-title">Estado de la sesión</h2>
+            <p class="section-subtitle">
+              Comprueba qué usuario se encuentra autenticado en este momento y si existe una sesión activa.
+            </p>
+          </div>
+
+          <p id="usuario-activo-pagina" class="mb-0 text-muted text-center">
             Comprobando el usuario activo...
           </p>
         </div>

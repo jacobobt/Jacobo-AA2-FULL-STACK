@@ -63,16 +63,24 @@
 
   <main class="container py-4">
     <!-- Título principal de la página -->
-    <section class="mb-4">
-      <h1 class="h3 page-heading mb-1">Gestión de ofertas y demandas</h1>
-      <p class="page-subtitle mb-0">Creación, consulta y borrado de publicaciones almacenadas en IndexedDB.</p>
+    <section class="page-intro">
+      <h1 class="page-heading">Gestión de ofertas y demandas</h1>
+      <p class="page-subtitle mb-0">
+        Crea, consulta y elimina publicaciones profesionales almacenadas en IndexedDB de forma estructurada y
+        persistente.
+      </p>
     </section>
 
     <div class="row g-4 mb-4">
       <!-- FORMULARIO -->
       <div class="col-12 col-lg-5">
         <section class="seccion-formulario h-100">
-          <h2 class="h5 mb-3">Nueva publicación</h2>
+          <div class="section-heading-block">
+            <h2 class="section-title">Nueva publicación</h2>
+            <p class="section-subtitle">
+              Completa el formulario para registrar ofertas o demandas de empleo con almacenamiento local persistente.
+            </p>
+          </div>
 
           <form id="form-publicacion" novalidate>
             <div class="mb-3">
@@ -131,9 +139,11 @@
       <!-- GRÁFICO -->
       <div class="col-12 col-lg-7">
         <section class="seccion-listado h-100">
-          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h2 class="h5 mb-0">Gráfico Canvas</h2>
-            <small class="text-muted">Ofertas vs demandas</small>
+          <div class="section-heading-block">
+            <h2 class="section-title">Resumen gráfico de publicaciones</h2>
+            <p class="section-subtitle">
+              Visualiza de forma inmediata la distribución actual entre ofertas y demandas mediante Canvas.
+            </p>
           </div>
 
           <div class="canvas-wrapper">
@@ -145,9 +155,11 @@
 
     <!-- LISTADO -->
     <section class="seccion-listado">
-      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h2 class="h5 mb-0">Listado de publicaciones</h2>
-        <small class="text-muted">Persistencia en IndexedDB</small>
+      <div class="section-heading-block">
+        <h2 class="section-title">Listado de publicaciones</h2>
+        <p class="section-subtitle">
+          Consulta las publicaciones registradas y elimina aquellas que ya no deban mantenerse en el sistema.
+        </p>
       </div>
 
       <div class="table-responsive table-wrapper">
