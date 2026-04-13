@@ -1,131 +1,198 @@
-# Arquetipos de usuarios - Producto 1 (JobConnect)
+# Arquetipos de usuarios - Producto 2 (JobConnect)
 
 ## 1. Introducción
-Este documento define los arquetipos de usuario (personas) del proyecto **JobConnect**, una plataforma colaborativa de ofertas y demandas de empleo.
+Este documento define los principales arquetipos de usuario del **Producto 2** del proyecto **JobConnect**, una aplicación web orientada a la gestión de ofertas y demandas de empleo.
 
-Los arquetipos ayudan a diseñar una interfaz más útil y realista, teniendo en cuenta:
-- quién usará la aplicación
-- qué necesidades tiene
-- qué objetivos quiere alcanzar
+El objetivo de estos arquetipos es representar perfiles de uso realistas para justificar decisiones de diseño, usabilidad y funcionalidad. En esta fase del proyecto, además de la interfaz, también se ha tenido en cuenta la interacción con persistencia en navegador y el uso de APIs de HTML5.
+
+Los arquetipos ayudan a entender:
+- quién utilizará la aplicación
+- qué espera conseguir cada usuario
 - qué dificultades puede encontrar
+- qué elementos de la interfaz le resultan más importantes
 
 ---
 
-## 2. Arquetipo 1 - Estudiante en búsqueda de prácticas
+## 2. Arquetipo 1 - Estudiante o candidato en búsqueda de oportunidades
 
 ### Perfil general
 - **Nombre ficticio**: Laura Martínez
 - **Edad**: 22 años
-- **Situación**: Estudiante de DAW
-- **Objetivo principal**: Encontrar prácticas o primera oportunidad laboral
+- **Situación**: Estudiante de DAW que busca prácticas o una primera oportunidad laboral
+- **Objetivo principal**: Consultar ofertas y publicar una demanda de empleo
 - **Nivel digital**: Medio
 
 ### Necesidades
-- Consultar ofertas de prácticas rápidamente
-- Ver información resumida y clara
-- Poder publicar una demanda de empleo
-- Tener una interfaz sencilla y sin complejidad técnica
+- Acceder rápidamente a las ofertas disponibles
+- Ver información clara y resumida de cada publicación
+- Poder registrarse o iniciar sesión sin dificultad
+- Publicar una demanda con sus datos de contacto
+- Visualizar sus opciones de manera simple y ordenada
 
 ### Motivaciones
-- Ganar experiencia profesional
+- Encontrar una primera experiencia profesional
 - Mejorar su currículum
-- Encontrar una oportunidad relacionada con desarrollo web
+- Tener más visibilidad dentro del entorno laboral
+- Participar en una plataforma sencilla y funcional
 
 ### Frustraciones
-- Formularios largos o confusos
-- Falta de información en las ofertas
-- Navegación complicada
+- Formularios poco claros o demasiado largos
+- Errores sin explicación
+- Interfaz sobrecargada
+- Navegación poco intuitiva
+- No saber si una acción se ha realizado correctamente
 
-### Cómo influye en el diseño
+### Cómo influye en el diseño del Producto 2
 Este arquetipo justifica:
-- uso de tarjetas visuales en el dashboard
-- formularios claros y sencillos
-- feedback visual inmediato (mensajes de error/éxito)
-- navegación simple entre pantallas
+- formularios claros y accesibles en login y publicaciones
+- mensajes de error y éxito visibles
+- estructura visual simple y ordenada
+- dashboard con visualización rápida de publicaciones
+- interacción dinámica para seleccionar publicaciones mediante drag & drop
 
 ---
 
-## 3. Arquetipo 2 - Pequeña empresa que publica ofertas
+## 3. Arquetipo 2 - Empresa o empleador que publica ofertas
 
 ### Perfil general
 - **Nombre ficticio**: Carlos Ruiz
 - **Edad**: 38 años
 - **Situación**: Responsable de una pequeña empresa tecnológica
-- **Objetivo principal**: Publicar ofertas de empleo o colaboración
+- **Objetivo principal**: Publicar ofertas de empleo y consultar demandas existentes
 - **Nivel digital**: Medio-alto
 
 ### Necesidades
-- Publicar ofertas de forma rápida
-- Gestionar anuncios creados
-- Ver datos de contacto de personas interesadas
-- Interfaz profesional y ordenada
+- Crear publicaciones de oferta de forma rápida
+- Ver y revisar publicaciones ya registradas
+- Identificar fácilmente el tipo de publicación
+- Consultar datos de contacto de candidatos
+- Disponer de una interfaz profesional, clara y ordenada
 
 ### Motivaciones
-- Encontrar talento junior
 - Cubrir vacantes con rapidez
-- Participar en entornos colaborativos con estudiantes o perfiles técnicos
+- Encontrar perfiles técnicos adecuados
+- Gestionar publicaciones sin complicaciones
+- Tener un sistema visualmente serio y funcional
 
 ### Frustraciones
-- Sistemas lentos o poco claros
-- Falta de organización en los datos
-- No poder diferenciar ofertas de demandas
+- Falta de organización en la información
+- Interfaces poco profesionales
+- No poder diferenciar bien ofertas y demandas
+- Pérdida de datos al recargar
+- Procesos lentos o poco intuitivos
 
-### Cómo influye en el diseño
+### Cómo influye en el diseño del Producto 2
 Este arquetipo justifica:
-- pantalla específica de gestión de ofertas y demandas
-- tabla con datos clave (tipo, título, categoría, ubicación, contacto)
-- distinción visual entre oferta y demanda mediante colores/badges
-- estructura modular para ampliar funcionalidades en el futuro
+- pantalla específica para alta, consulta y borrado de ofertas y demandas
+- persistencia en `IndexedDB` para mantener publicaciones
+- tabla organizada con datos relevantes
+- uso de `Canvas` para representar visualmente la relación entre ofertas y demandas
+- diferenciación visual por tipo de publicación
 
 ---
 
-## 4. Arquetipo 3 - Usuario administrador del prototipo
+## 4. Arquetipo 3 - Usuario gestor o administrador del prototipo
 
 ### Perfil general
 - **Nombre ficticio**: Ana López
 - **Edad**: 30 años
-- **Situación**: Persona encargada de revisar usuarios y contenido
-- **Objetivo principal**: Gestionar usuarios y supervisar el funcionamiento del sistema
+- **Situación**: Persona encargada de revisar usuarios y comprobar el funcionamiento general de la aplicación
+- **Objetivo principal**: Gestionar usuarios, validar el flujo de uso y supervisar el sistema
 - **Nivel digital**: Alto
 
 ### Necesidades
-- Ver listado de usuarios registrados
-- Añadir usuarios de prueba
+- Consultar el listado completo de usuarios
+- Dar de alta usuarios de prueba
 - Eliminar usuarios incorrectos o duplicados
-- Tener visión global del sistema desde el dashboard
+- Ver el usuario activo en navegación
+- Tener una visión general del sistema desde el dashboard
 
 ### Motivaciones
 - Mantener orden en la aplicación
-- Asegurar que el prototipo es funcional
-- Simular un entorno de gestión real
+- Verificar que el prototipo funciona correctamente
+- Simular un escenario de gestión real
+- Comprobar la coherencia entre componentes
 
 ### Frustraciones
-- No poder identificar usuarios rápidamente
-- Errores sin mensajes claros
-- Interfaces inconsistentes entre pantallas
+- Datos mal organizados
+- Errores sin contexto
+- Interfaces inconsistentes
+- Falta de feedback tras acciones importantes
+- Dificultad para entender qué usuario está activo
 
-### Cómo influye en el diseño
+### Cómo influye en el diseño del Producto 2
 Este arquetipo justifica:
-- pantalla de gestión de usuarios con tabla dinámica
-- validaciones de formulario (campos obligatorios, email duplicado)
-- mensajes de confirmación/alerta
-- dashboard con métricas resumidas
+- módulo de usuarios con operaciones CRUD en `localStorage`
+- visualización del usuario activo en todas las pantallas
+- validaciones de datos en alta de usuarios
+- actualización dinámica de la tabla de usuarios
+- dashboard con métricas resumen para comprender el estado general del sistema
 
 ---
 
-## 5. Resumen de impacto de los arquetipos en el proyecto
-Los arquetipos definidos han influido en las decisiones de diseño y desarrollo del Producto 1:
+## 5. Relación entre arquetipos y componentes de la aplicación
 
-- **Interfaz clara y simple** para perfiles con experiencia digital media
-- **Separación por pantallas** según tareas (consultar, iniciar sesión, gestionar)
-- **Feedback visual** para reducir errores
-- **Navegación coherente** mediante navbar común
-- **Diferenciación visual** de publicaciones (oferta/demanda)
-- **Estructura modular** para facilitar evolución en productos posteriores
+### Login
+Da respuesta principalmente a:
+- estudiante o candidato
+- empresa o empleador
+- usuario gestor
+
+Se ha diseñado para ofrecer:
+- acceso sencillo
+- validación clara
+- persistencia del usuario activo
+- feedback inmediato en caso de error o éxito
+
+### Usuarios
+Da respuesta sobre todo a:
+- usuario gestor o administrador del prototipo
+
+Se ha diseñado para permitir:
+- alta de usuarios
+- consulta de usuarios existentes
+- borrado de registros
+- mantenimiento de usuarios en `localStorage`
+
+### Ofertas y demandas
+Da respuesta sobre todo a:
+- estudiante o candidato
+- empresa o empleador
+
+Se ha diseñado para facilitar:
+- creación de publicaciones
+- consulta de registros
+- borrado de publicaciones
+- almacenamiento persistente en `IndexedDB`
+- visualización gráfica mediante `Canvas`
+
+### Dashboard
+Da respuesta especialmente a:
+- estudiante o candidato
+- usuario gestor
+
+Se ha diseñado para permitir:
+- visualizar publicaciones disponibles
+- seleccionar publicaciones con drag & drop
+- guardar selección persistente en `IndexedDB`
+- consultar métricas generales del sistema
 
 ---
 
-## 6. Conclusión
-Los arquetipos permiten orientar el prototipo a necesidades reales de uso, mejorando la usabilidad y la coherencia del diseño.
+## 6. Impacto de los arquetipos en el diseño del Producto 2
+Los arquetipos han influido directamente en varias decisiones del proyecto:
 
-Aunque JobConnect se encuentra en una fase inicial (Producto 1), estos perfiles ayudan a construir una base sólida para futuras mejoras funcionales.
+- **navegación simple y consistente** mediante una barra común en todas las páginas
+- **formularios claros** para minimizar errores de entrada
+- **persistencia local** para mantener la información al recargar
+- **feedback visual inmediato** tras las acciones del usuario
+- **componentes separados por tarea** para mejorar la comprensión del sistema
+- **interacción más rica** gracias al uso de APIs HTML5 como Canvas y Drag & Drop
+- **estructura modular del código** para facilitar mantenimiento y evolución futura
+
+---
+
+## 7. Conclusión
+Los arquetipos definidos permiten justificar la estructura funcional y visual del **Producto 2** de JobConnect desde una perspectiva de uso real.
+
+Gracias a ellos, la aplicación no solo responde a requisitos técnicos, sino también a necesidades concretas de interacción, claridad y organización. Esto hace que el prototipo sea más coherente, más útil y mejor preparado para seguir evolucionando en las siguientes fases del proyecto.

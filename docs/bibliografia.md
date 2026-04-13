@@ -1,110 +1,158 @@
-# Bibliografía y recursos - Producto 1 (JobConnect)
+# Bibliografía y recursos consultados - Producto 2 (JobConnect)
 
 ## 1. Introducción
-Este documento recoge la bibliografía y los recursos consultados para el desarrollo del **Producto 1** del proyecto **JobConnect**.
+En este documento se recogen las principales fuentes de información, documentación técnica y recursos de consulta utilizados durante el desarrollo del **Producto 2** del proyecto **JobConnect**.
 
-Se han utilizado recursos orientados a:
-- HTML5
-- CSS3
-- Bootstrap 5
+En esta fase del proyecto, las referencias se han centrado especialmente en:
+- el uso de **JavaScript modular**
+- la persistencia en navegador mediante **localStorage** e **IndexedDB**
+- la utilización de APIs de HTML5 como **Canvas** y **Drag & Drop**
+- el apoyo visual y estructural de **Bootstrap 5**
+- la consulta de buenas prácticas de desarrollo frontend
+
+Estas fuentes han servido tanto para resolver dudas técnicas como para fundamentar decisiones de implementación, estructura y usabilidad.
+
+---
+
+## 2. Documentación técnica principal
+
+### Mozilla Developer Network (MDN)
+MDN ha sido una de las fuentes principales de consulta, especialmente para comprender el funcionamiento nativo de las APIs web utilizadas en el proyecto.
+
+Se ha consultado documentación sobre:
 - JavaScript
-- Usabilidad y UX
-- Arquitectura web frontend
-- Control de versiones con Git/GitHub
+- módulos ES
+- `localStorage`
+- `IndexedDB`
+- `Canvas`
+- Drag & Drop API
+- manipulación del DOM
+- eventos del navegador
+
+**Utilidad en el proyecto**:
+- implementación de persistencia local
+- uso de funciones asíncronas
+- gestión de eventos
+- generación de gráficos nativos
+- interacción entre componentes de la interfaz
 
 ---
 
-## 2. Recursos técnicos utilizados
+### Bootstrap 5 Documentation
+La documentación oficial de Bootstrap se ha utilizado para estructurar y dar estilo a la interfaz del proyecto.
 
-## 2.1 HTML, CSS y JavaScript
-### MDN Web Docs
-- **Descripción**: Documentación de referencia para HTML, CSS y JavaScript
-- **Uso en el proyecto**: Consulta de sintaxis, eventos DOM, formularios, arrays, objetos y manipulación del DOM
-- **Referencia**: MDN Web Docs (Mozilla Developer Network)
+Se ha consultado especialmente para:
+- sistema de rejilla
+- formularios
+- tablas
+- tarjetas
+- botones
+- utilidades de espaciado y alineación
+- componentes visuales reutilizables
 
-### W3Schools (apoyo complementario)
-- **Descripción**: Recurso práctico con ejemplos simples y rápidos
-- **Uso en el proyecto**: Revisión de ejemplos de formularios, tablas y JavaScript básico
-- **Referencia**: W3Schools
-
----
-
-## 2.2 Bootstrap 5
-### Bootstrap Official Documentation
-- **Descripción**: Documentación oficial del framework Bootstrap
-- **Uso en el proyecto**: Uso de navbar, grid system, formularios, tablas, botones, badges y alerts
-- **Referencia**: Bootstrap 5 Documentation
+**Utilidad en el proyecto**:
+- maquetación responsive
+- consistencia visual entre pantallas
+- mejora de la usabilidad
+- organización clara del contenido
 
 ---
 
-## 2.3 JavaScript y eventos
-### JavaScript.info (recurso complementario)
-- **Descripción**: Explicaciones prácticas sobre JavaScript y DOM
-- **Uso en el proyecto**: Comprensión de eventos (`submit`, `click`) y renderizado dinámico
-- **Referencia**: JavaScript.info
+## 3. Recursos concretos por tecnología
 
-### Cisco Networking Academy - JavaScript Essentials
-- **Descripción**: Curso formativo de JavaScript realizado como parte del producto
-- **Uso en el proyecto**: Base conceptual para lógica JS, variables, funciones, arrays, objetos y flujo de control
-- **Referencia**: Cisco NetAcad - JavaScript Essentials
+## 3.1 JavaScript modular
+Se han revisado recursos sobre programación modular en JavaScript para organizar la lógica del proyecto en archivos separados y reutilizables.
 
----
-
-## 2.4 Git y GitHub
-### Git Official Documentation
-- **Descripción**: Documentación oficial de Git
-- **Uso en el proyecto**: Comandos básicos de repositorio local (`init`, `add`, `commit`, `push`)
-- **Referencia**: Git Documentation
-
-### GitHub Docs
-- **Descripción**: Documentación oficial de GitHub
-- **Uso en el proyecto**: Creación de repositorio remoto, conexión con repositorio local y publicación del proyecto
-- **Referencia**: GitHub Docs
+**Aplicación en el proyecto**:
+- separación por componentes funcionales
+- organización de la lógica de login, usuarios, publicaciones y dashboard
+- centralización de la persistencia en `almacenaje.js`
 
 ---
 
-## 3. Recursos de usabilidad y UX
+## 3.2 Web Storage (`localStorage`)
+Se ha consultado documentación sobre Web Storage para comprender el almacenamiento persistente de datos sencillos en el navegador.
 
-### Nielsen Norman Group (NN/g)
-- **Descripción**: Referencia internacional sobre usabilidad y experiencia de usuario
-- **Uso en el proyecto**: Consulta de principios básicos de usabilidad (consistencia, feedback, claridad)
-- **Referencia**: Nielsen Norman Group
-
-### Material Design (Google) - principios de diseño (consulta general)
-- **Descripción**: Guía de principios visuales y de interacción
-- **Uso en el proyecto**: Inspiración para jerarquía visual y organización de componentes
-- **Referencia**: Material Design Guidelines
+**Aplicación en el proyecto**:
+- gestión de usuarios
+- mantenimiento del usuario activo
+- almacenamiento de marcas internas de inicialización
 
 ---
 
-## 4. Recursos sobre arquitectura web frontend
+## 3.3 IndexedDB
+Se han revisado fuentes para entender la creación de bases de datos locales en navegador, los object stores, las transacciones y las operaciones CRUD asíncronas.
 
-### Mozilla Developer Network (MDN) - Client-side web development
-- **Descripción**: Guías introductorias y prácticas sobre desarrollo web del lado cliente
-- **Uso en el proyecto**: Comprensión de estructura frontend, separación HTML/CSS/JS y modularidad
-- **Referencia**: MDN - Client-side web development
-
-### Documentación oficial de JavaScript (ECMAScript modules)
-- **Descripción**: Información sobre módulos JS (`import` / `export`)
-- **Uso en el proyecto**: Organización modular de scripts (`datos.js`, `ui.js`, etc.)
-- **Referencia**: MDN - JavaScript Modules
+**Aplicación en el proyecto**:
+- almacenamiento de ofertas y demandas
+- almacenamiento de publicaciones seleccionadas en el dashboard
+- persistencia real al recargar la página
 
 ---
 
-## 5. Uso de IA generativa como recurso de apoyo
-### ChatGPT
-- **Descripción**: Herramienta de apoyo para guía técnica, estructuración del proyecto, generación de ejemplos y documentación
-- **Uso en el proyecto**:
-  - diseño de estructura de carpetas y archivos
-  - ayuda con HTML/CSS/Bootstrap
-  - implementación paso a paso de JavaScript
-  - redacción técnica de documentación
-- **Observación**: Las respuestas se revisaron y adaptaron manualmente
-- **Referencia**: ChatGPT (OpenAI)
+## 3.4 Canvas
+Se ha consultado documentación específica sobre la API `Canvas` para representar gráficamente los datos de publicaciones.
+
+**Aplicación en el proyecto**:
+- generación de un gráfico nativo
+- representación visual comparativa entre ofertas y demandas
+- mejora de la presentación de datos sin usar librerías externas
+
+---
+
+## 3.5 Drag & Drop
+Se han consultado recursos sobre arrastrar y soltar elementos en aplicaciones web.
+
+**Aplicación en el proyecto**:
+- selección de publicaciones desde el dashboard
+- interacción visual directa entre publicaciones disponibles y seleccionadas
+- mejora de la experiencia de uso
+
+---
+
+## 4. Recursos de apoyo y aprendizaje
+
+## 4.1 Microsoft Learn
+Se han tenido en cuenta materiales de aprendizaje orientados al desarrollo frontend con JavaScript, especialmente en temas relacionados con:
+- módulos
+- asincronía
+- promesas
+- buenas prácticas de organización de código
+
+**Utilidad en el proyecto**:
+- mejor comprensión de la estructura modular
+- apoyo conceptual para trabajar con funciones asíncronas
+- refuerzo del enfoque formativo del producto
+
+---
+
+## 4.2 Recursos del aula y enunciado de la actividad
+Además de la documentación técnica externa, también se han utilizado como referencia:
+- el enunciado del producto
+- la rúbrica de evaluación
+- los vídeos orientativos proporcionados en el aula
+- los recursos recomendados por la asignatura
+
+**Utilidad en el proyecto**:
+- adaptación del proyecto a los requisitos concretos de evaluación
+- comprobación de que cada componente cumple su función esperada
+- alineación entre implementación y entrega
+
+---
+
+## 5. Uso práctico de estas fuentes en el proyecto
+La consulta de estas referencias ha permitido tomar decisiones concretas en el desarrollo del Producto 2, por ejemplo:
+
+- estructurar el proyecto en módulos JavaScript
+- aplicar persistencia local diferenciando `localStorage` e `IndexedDB`
+- implementar un gráfico con `Canvas` de forma nativa
+- utilizar la API Drag & Drop en el dashboard
+- mantener una interfaz clara mediante Bootstrap
+- reforzar la coherencia entre las distintas pantallas del sistema
 
 ---
 
 ## 6. Conclusión
-La combinación de documentación oficial (MDN, Bootstrap, Git, GitHub), recursos de apoyo (W3Schools, JavaScript.info) y materiales de usabilidad/UX ha permitido desarrollar el Producto 1 con una base técnica correcta.
+La bibliografía y los recursos consultados han sido fundamentales para desarrollar correctamente el **Producto 2** de JobConnect.
 
-Además, la IA generativa se ha utilizado como apoyo formativo y técnico, manteniendo siempre revisión manual y adaptación al enunciado del proyecto.
+Gracias a estas fuentes, ha sido posible implementar una aplicación frontend más completa que en la fase anterior, incorporando persistencia real en navegador, APIs de HTML5 y una organización modular del código, todo ello manteniendo una interfaz clara, usable y preparada para evolucionar en futuras fases del proyecto.

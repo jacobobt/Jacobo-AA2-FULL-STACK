@@ -2,7 +2,8 @@ import {
   crearUsuario,
   eliminarUsuario,
   inicializarAlmacenamiento,
-  listarUsuarios
+  listarUsuarios,
+  obtenerUsuarioActivo
 } from "./almacenaje.js";
 import {
   capitalizarTexto,
@@ -53,6 +54,25 @@ async function inicializarPaginaUsuarios() {
 }
 
 /*
+  Devuelve una versión oculta de la contraseña para mostrarla en la tabla.
+
+  No cambia la contraseña real almacenada.
+  Solo evita que se vea en texto plano en pantalla.
+
+  Ejemplo:
+  "1234" -> "••••"
+*/
+function ocultarPassword(password) {
+  const longitud = String(password || "").length;
+
+  if (longitud === 0) {
+    return "";
+  }
+
+  return "•".repeat(longitud);
+}
+
+/*
   Esta función pinta en la tabla todos los usuarios guardados.
 
   Hace esto:
@@ -69,7 +89,7 @@ function pintarTablaUsuarios() {
   */
   if (usuarios.length === 0) {
     tablaUsuariosBody.innerHTML = `
-      <tr>
+      <tr class="fila-vacia">
         <td colspan="6" class="text-center text-muted">No hay usuarios registrados.</td>
       </tr>
     `;
@@ -97,22 +117,25 @@ function pintarTablaUsuarios() {
 
     /*
       Construimos el HTML de la fila.
-      Mostramos:
-      - id
-      - nombre completo
-      - email
-      - contraseña
-      - rol
-      - botón eliminar
+
+      Mejora aplicada:
+      en la columna de acción usamos una X compacta en rojo,
+      así evitamos que el botón se corte y el diseño queda más limpio.
     */
     fila.innerHTML = `
       <td>${usuario.id}</td>
       <td>${usuario.nombre} ${usuario.apellidos}</td>
       <td>${usuario.email}</td>
-      <td>${usuario.password}</td>
-      <td><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
-      <td>
-        <button class="btn btn-sm btn-danger" data-email="${usuario.email}">Eliminar</button>
+      <td>${ocultarPassword(usuario.password)}</td>
+      <td class="columna-rol"><span class="badge ${claseRol}">${capitalizarTexto(usuario.rol)}</span></td>
+      <td class="columna-accion">
+        <button
+          class="btn btn-sm btn-action-delete-icon"
+          data-email="${usuario.email}"
+          type="button"
+          aria-label="Eliminar usuario"
+          title="Eliminar usuario"
+        >✕</button>
       </td>
     `;
 
@@ -124,8 +147,13 @@ function pintarTablaUsuarios() {
     /*
       Cuando el usuario pulse ese botón,
       se ejecutará la función que borra ese usuario por su email.
+
+      También pasamos el nombre completo para que el mensaje
+      de confirmación sea más claro.
     */
-    botonEliminar.addEventListener("click", () => gestionarBorradoUsuario(usuario.email));
+    botonEliminar.addEventListener("click", () =>
+      gestionarBorradoUsuario(usuario.email, `${usuario.nombre} ${usuario.apellidos}`)
+    );
 
     /*
       Finalmente añadimos la fila al cuerpo de la tabla.
@@ -203,20 +231,45 @@ function gestionarAltaUsuario(evento) {
 /*
   Esta función elimina un usuario usando su email.
 
-  Hace esto:
-  1. llama a eliminarUsuario(email)
-  2. repinta la tabla
-  3. repinta la navbar
-  4. muestra mensaje de éxito
-
-  Si algo falla, muestra mensaje de error.
+  Mejoras funcionales aplicadas:
+  - antes de borrar, se pide confirmación
+  - si el usuario a eliminar es el que tiene la sesión activa,
+    se avisa de que la sesión se cerrará automáticamente
 */
-function gestionarBorradoUsuario(email) {
+function gestionarBorradoUsuario(email, nombreCompleto) {
+  const usuarioActivo = obtenerUsuarioActivo();
+  const esUsuarioActivo = usuarioActivo && usuarioActivo.email === email;
+
+  /*
+    Construimos un mensaje distinto según el caso:
+    - borrado normal
+    - borrado del usuario que tiene la sesión activa
+  */
+  const mensajeConfirmacion = esUsuarioActivo
+    ? `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?\n\nEste es el usuario que tiene la sesión activa ahora mismo, así que al borrarlo también se cerrará la sesión.`
+    : `¿Seguro que quieres eliminar al usuario "${nombreCompleto}"?`;
+
+  const confirmarBorrado = window.confirm(mensajeConfirmacion);
+
+  if (!confirmarBorrado) {
+    mostrarAlerta(mensajeUsuario, "Eliminación cancelada por el usuario.", "secondary");
+    return;
+  }
+
   try {
     eliminarUsuario(email);
     pintarTablaUsuarios();
     pintarUsuarioEnNavbar();
-    mostrarAlerta(mensajeUsuario, "Usuario eliminado correctamente.", "success");
+
+    /*
+      También diferenciamos el mensaje final según si el usuario borrado
+      era el que estaba logueado.
+    */
+    const mensajeExito = esUsuarioActivo
+      ? `Usuario "${nombreCompleto}" eliminado correctamente. La sesión activa se ha cerrado.`
+      : `Usuario "${nombreCompleto}" eliminado correctamente.`;
+
+    mostrarAlerta(mensajeUsuario, mensajeExito, "success");
   } catch (error) {
     mostrarAlerta(mensajeUsuario, error.message, "danger");
   }

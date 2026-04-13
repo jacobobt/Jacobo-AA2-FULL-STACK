@@ -10,6 +10,7 @@ Versión evolucionada del Producto 1 para la asignatura FP.450.
 - **Canvas** nativo para representar ofertas vs demandas.
 - **Drag & Drop** nativo en el dashboard.
 - Código modular preparado para sustituir más adelante la persistencia local por llamadas a un backend.
+- Iteración final de mejora visual sobre las pantallas de login, usuarios y ofertas/demandas mediante estilos personalizados sobre Bootstrap.
 
 ## Scripts principales
 
